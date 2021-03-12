@@ -153,7 +153,8 @@ public class Translator {
                     .roleArn(cfnChannelStorage.getCustomerManagedS3().getRoleArn())
                     .build()
             );
-        } else {
+        }
+        if (cfnChannelStorage.getServiceManagedS3() != null) {
             builder.serviceManagedS3(ServiceManagedChannelS3Storage.builder().build());
         }
         return builder.build();

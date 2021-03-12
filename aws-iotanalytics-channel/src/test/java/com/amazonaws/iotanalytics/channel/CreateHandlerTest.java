@@ -188,5 +188,6 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         assertThrows(CfnAlreadyExistsException.class,
                 () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        assertThat(createChannelRequestCaptor.getValue().channelName()).isEqualTo(TEST_CHANNEL_NAME);
     }
 }
