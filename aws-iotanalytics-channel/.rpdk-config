@@ -1,6 +1,6 @@
 {
     "artifact_type": "RESOURCE",
-    "typeName": "AWS::IotAnalytics::Channel",
+    "typeName": "AWS::IoTAnalytics::Channel",
     "language": "java",
     "runtime": "java8",
     "entrypoint": "com.amazonaws.iotanalytics.channel.HandlerWrapper::handleRequest",
