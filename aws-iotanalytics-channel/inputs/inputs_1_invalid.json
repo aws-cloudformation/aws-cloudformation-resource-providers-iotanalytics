@@ -1,0 +1,9 @@
+{
+  "ChannelName": "mychannel2",
+  "Tags": [
+  ],
+  "ChannelStorage": {
+    "ServiceManagedS3": {
+    }
+  }
+}

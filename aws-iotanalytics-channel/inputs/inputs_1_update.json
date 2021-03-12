@@ -1,0 +1,25 @@
+{
+  "ChannelName": "mychannel1",
+  "Tags": [
+    {
+      "Key": "key2",
+      "Value": "value22"
+    },
+    {
+      "Key": "key3",
+      "Value": "value3"
+    },
+    {
+      "Key": "key4",
+      "Value": "value4"
+    }
+  ],
+  "ChannelStorage": {
+    "ServiceManagedS3": {
+    }
+  },
+  "RetentionPeriod": {
+    "NumberOfDays": 30,
+    "Unlimited": false
+  }
+}
