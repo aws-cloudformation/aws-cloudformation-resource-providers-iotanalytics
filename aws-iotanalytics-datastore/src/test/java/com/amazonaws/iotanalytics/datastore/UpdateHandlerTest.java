@@ -215,7 +215,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void GIVEN_update_diff_channel_name_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
+    public void GIVEN_update_diff_datastore_name_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
         // GIVEN
         final ResourceModel preModel = ResourceModel.builder().datastoreName("name1").build();
         final ResourceModel newModel = ResourceModel.builder().datastoreName("name2").build();
@@ -237,7 +237,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void GIVEN_update_channel_arn_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
+    public void GIVEN_update_datastore_arn_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
         // GIVEN
         final ResourceModel preModel = ResourceModel.builder().datastoreName("name1").id("id1").build();
         final ResourceModel newModel = ResourceModel.builder().datastoreName("name1").id("id2").build();
@@ -259,7 +259,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void GIVEN_update_same_channel_arn_WHEN_call_handleRequest_THEN_return_success() {
+    public void GIVEN_update_same_datastore_arn_WHEN_call_handleRequest_THEN_return_success() {
         // GIVEN
         final ResourceModel preModel = ResourceModel.builder().datastoreName(TEST_DATASTORE_NAME).id(TEST_DATASTORE_ID).build();
         final ResourceModel newModel = ResourceModel.builder().datastoreName(TEST_DATASTORE_NAME).id(TEST_DATASTORE_ID).build();

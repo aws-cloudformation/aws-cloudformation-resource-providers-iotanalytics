@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UpdateHandler extends BaseIoTAnalyticsHandler {
-    private static final String OPERATION_CHANNEL = "UpdateDatastore";
+    private static final String OPERATION_DATASTORE = "UpdateDatastore";
     private static final String OPERATION_DELETE_TAG = "UpdateDatastore_DeleteTags";
     private static final String OPERATION_ADD_TAG = "UpdateDatastore_AddTags";
 
-    private static final String CALL_GRAPH_CHANNEL = "AWS-IoT-Datastore::Update";
+    private static final String CALL_GRAPH_DATASTORE = "AWS-IoT-Datastore::Update";
     private static final String CALL_GRAPH_DELETE_TAG = "AWS-IoT-Datastore::Update-Delete-TAG";
     private static final String CALL_GRAPH_ADD_TAG = "AWS-IoT-Datastore::Update-ADD-TAG";
     private Logger logger;
@@ -51,7 +51,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
 
         return ProgressEvent.progress(newModel, callbackContext)
                 .then(progress ->
-                        proxy.initiate(CALL_GRAPH_CHANNEL, proxyClient, newModel, callbackContext)
+                        proxy.initiate(CALL_GRAPH_DATASTORE, proxyClient, newModel, callbackContext)
                                 .translateToServiceRequest(Translator::translateToUpdateDatastoreRequest)
                                 .backoffDelay(DELAY_CONSTANT)
                                 .makeServiceCall(this::updateDatastore)
@@ -73,7 +73,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
             logger.log(String.format("ERROR %s [%s] fail to be updated: %s", ResourceModel.TYPE_NAME, updateDatastoreRequest.datastoreName(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,
-                    OPERATION_CHANNEL,
+                    OPERATION_DATASTORE,
                     updateDatastoreRequest.datastoreName());
         }
     }
