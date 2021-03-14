@@ -21,6 +21,7 @@
         "Tags": {
             "type": "array",
             "uniqueItems": false,
+            "minLength": 1,
             "maxLength": 50,
             "items": {
                 "$ref": "#/definitions/Tag"
@@ -78,14 +79,14 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "Value": {
+                "Key": {
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 128
                 },
-                "Key": {
+                "Value": {
                     "type": "string",
-                    "minLength": 0,
+                    "minLength": 1,
                     "maxLength": 256
                 }
             },
