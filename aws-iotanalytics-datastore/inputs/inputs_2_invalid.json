@@ -1,0 +1,17 @@
+{
+  "DatastoreName": "mydatastore3",
+  "FileFormatConfiguration": {
+    "ParquetConfiguration": {
+      "SchemaDefinition": {
+        "Columns": [
+          {
+            "Name": "onlyName"
+          },
+          {
+            "Type": "onlyValue"
+          }
+        ]
+      }
+    }
+  }
+}
