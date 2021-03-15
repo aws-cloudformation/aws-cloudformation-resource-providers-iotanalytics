@@ -30,9 +30,9 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
     private static final String OPERATION_DELETE_TAG = "UpdateDatastore_DeleteTags";
     private static final String OPERATION_ADD_TAG = "UpdateDatastore_AddTags";
 
-    private static final String CALL_GRAPH_DATASTORE = "AWS-IoT-Datastore::Update";
-    private static final String CALL_GRAPH_DELETE_TAG = "AWS-IoT-Datastore::Update-Delete-TAG";
-    private static final String CALL_GRAPH_ADD_TAG = "AWS-IoT-Datastore::Update-ADD-TAG";
+    private static final String CALL_GRAPH_DATASTORE = "AWS-IoTAnalytics-Datastore::Update";
+    private static final String CALL_GRAPH_DELETE_TAG = "AWS-IoTAnalytics-Datastore::Update-Delete-Tag";
+    private static final String CALL_GRAPH_ADD_TAG = "AWS-IoTAnalytics-Datastore::Update-Add-Tag";
     private Logger logger;
 
     @Override

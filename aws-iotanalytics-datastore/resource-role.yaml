@@ -27,6 +27,7 @@ Resources:
                 - "iotanalytics:DeleteDatastore"
                 - "iotanalytics:DescribeDatastore"
                 - "iotanalytics:ListDatastores"
+                - "iotanalytics:UpdateDatastore"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

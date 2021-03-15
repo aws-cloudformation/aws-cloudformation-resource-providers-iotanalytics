@@ -1,6 +1,7 @@
 package com.amazonaws.iotanalytics.datastore;
 
 import com.amazonaws.util.StringUtils;
+import com.google.common.annotations.VisibleForTesting;
 import software.amazon.awssdk.services.iotanalytics.model.Column;
 import software.amazon.awssdk.services.iotanalytics.model.Datastore;
 import software.amazon.awssdk.services.iotanalytics.model.DatastoreStorage;
@@ -38,7 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Translator {
+class Translator {
+    private Translator() {}
     static ResourceModel translateFromDescribeResponse(final DescribeDatastoreResponse describeDatastoreResponse,
                                                        final ListTagsForResourceResponse listTagsForResourceResponse) {
         final Datastore datastore = describeDatastoreResponse.datastore();
@@ -206,16 +208,17 @@ public class Translator {
         return builder.build();
     }
 
-    private static com.amazonaws.iotanalytics.datastore.SchemaDefinition translateSchemaDefinitionToCfn(
-            @Nullable final SchemaDefinition cfnSchemaDefinition
+    @VisibleForTesting
+    static com.amazonaws.iotanalytics.datastore.SchemaDefinition translateSchemaDefinitionToCfn(
+            @Nullable final SchemaDefinition schemaDefinition
     ) {
-        if (cfnSchemaDefinition == null) {
+        if (schemaDefinition == null) {
             return null;
         }
         final com.amazonaws.iotanalytics.datastore.SchemaDefinition.SchemaDefinitionBuilder builder =
                 com.amazonaws.iotanalytics.datastore.SchemaDefinition.builder();
-        if (cfnSchemaDefinition.columns() != null) {
-            builder.columns(cfnSchemaDefinition.columns().stream().map(column ->
+        if (schemaDefinition.columns() != null) {
+            builder.columns(schemaDefinition.columns().stream().map(column ->
                     com.amazonaws.iotanalytics.datastore.Column.builder()
                             .name(column.name())
                             .type(column.type())
@@ -225,15 +228,16 @@ public class Translator {
         return builder.build();
     }
 
-    private static SchemaDefinition translateSchemaDefinitionFromCfn(
-            @Nullable final com.amazonaws.iotanalytics.datastore.SchemaDefinition schemaDefinition
+    @VisibleForTesting
+    static SchemaDefinition translateSchemaDefinitionFromCfn(
+            @Nullable final com.amazonaws.iotanalytics.datastore.SchemaDefinition cfnSchemaDefinition
     ) {
-        if (schemaDefinition == null) {
+        if (cfnSchemaDefinition == null) {
             return null;
         }
         final SchemaDefinition.Builder builder = SchemaDefinition.builder();
-        if (schemaDefinition.getColumns() != null) {
-            builder.columns(schemaDefinition.getColumns().stream().map(column ->
+        if (cfnSchemaDefinition.getColumns() != null) {
+            builder.columns(cfnSchemaDefinition.getColumns().stream().map(column ->
                     Column.builder()
                             .name(column.getName())
                             .type(column.getType())
@@ -256,12 +260,12 @@ public class Translator {
     }
 
     private static List<Tag> translateTagListsFromCfn(
-            @Nullable final List<com.amazonaws.iotanalytics.datastore.Tag> tagList
+            @Nullable final List<com.amazonaws.iotanalytics.datastore.Tag> cfnTagList
     ) {
-        if (tagList == null) {
+        if (cfnTagList == null) {
             return null;
         } else {
-            return tagList.stream().map(tag ->
+            return cfnTagList.stream().map(tag ->
                     Tag.builder()
                             .key(tag.getKey())
                             .value(tag.getValue())

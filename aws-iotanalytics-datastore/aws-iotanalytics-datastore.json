@@ -186,7 +186,7 @@
         },
         "update": {
             "permissions": [
-                "iotanalytics:DescribeDatastore"
+                "iotanalytics:UpdateDatastore"
             ]
         },
         "delete": {
