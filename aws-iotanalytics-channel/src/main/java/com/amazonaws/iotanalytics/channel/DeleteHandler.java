@@ -17,7 +17,6 @@ public class DeleteHandler extends BaseIoTAnalyticsHandler {
     private static final String OPERATION_READ = "DeleteChannel_Read";
 
     private Logger logger;
-    private AmazonWebServicesClientProxy proxy;
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -28,7 +27,7 @@ public class DeleteHandler extends BaseIoTAnalyticsHandler {
         final Logger logger) {
 
         this.logger = logger;
-        this.proxy = proxy;
+
         final ResourceModel model = request.getDesiredResourceState();
 
         return proxy.initiate(CALL_GRAPH, proxyClient, model, callbackContext)
@@ -42,7 +41,7 @@ public class DeleteHandler extends BaseIoTAnalyticsHandler {
     private DeleteChannelResponse deleteChannel(final DeleteChannelRequest request,
                                                 final ProxyClient<IoTAnalyticsClient> proxyClient) {
         try {
-            DeleteChannelResponse response = proxy.injectCredentialsAndInvokeV2(
+            final DeleteChannelResponse response = proxyClient.injectCredentialsAndInvokeV2(
                     request,
                     proxyClient.client()::deleteChannel);
             logger.log(String.format("%s [%s] successfully deleted", ResourceModel.TYPE_NAME, request.channelName()));
@@ -64,7 +63,7 @@ public class DeleteHandler extends BaseIoTAnalyticsHandler {
             final CallbackContext callbackContext) {
         try {
             final DescribeChannelRequest describeChannelRequest = DescribeChannelRequest.builder().channelName(model.getChannelName()).build();
-            proxy.injectCredentialsAndInvokeV2(describeChannelRequest, proxyClient.client()::describeChannel);
+            proxyClient.injectCredentialsAndInvokeV2(describeChannelRequest, proxyClient.client()::describeChannel);
             logger.log(String.format("ERROR %s [%s] still exists after deleting", ResourceModel.TYPE_NAME, request.channelName()));
             return false;
         } catch (final ResourceNotFoundException e) {

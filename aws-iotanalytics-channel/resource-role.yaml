@@ -27,6 +27,10 @@ Resources:
                 - "iotanalytics:DeleteChannel"
                 - "iotanalytics:DescribeChannel"
                 - "iotanalytics:ListChannels"
+                - "iotanalytics:ListTagsForResource"
+                - "iotanalytics:TagResource"
+                - "iotanalytics:UntagResource"
+                - "iotanalytics:UpdateChannel"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

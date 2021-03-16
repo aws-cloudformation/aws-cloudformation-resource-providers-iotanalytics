@@ -127,12 +127,15 @@
         },
         "read": {
             "permissions": [
-                "iotanalytics:DescribeChannel"
+                "iotanalytics:DescribeChannel",
+                "iotanalytics:ListTagsForResource"
             ]
         },
         "update": {
             "permissions": [
-                "iotanalytics:DescribeChannel"
+                "iotanalytics:UpdateChannel",
+                "iotanalytics:TagResource",
+                "iotanalytics:UntagResource"
             ]
         },
         "delete": {

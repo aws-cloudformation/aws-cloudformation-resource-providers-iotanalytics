@@ -33,9 +33,9 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
     private static final String OPERATION_DELETE_TAG = "UpdateChannel_DeleteTags";
     private static final String OPERATION_ADD_TAG = "UpdateChannel_AddTags";
 
-    private static final String CALL_GRAPH_CHANNEL = "AWS-IoT-Channel::Update";
-    private static final String CALL_GRAPH_DELETE_TAG = "AWS-IoT-Channel::Update-Delete-TAG";
-    private static final String CALL_GRAPH_ADD_TAG = "AWS-IoT-Channel::Update-ADD-TAG";
+    private static final String CALL_GRAPH_CHANNEL = "AWS-IoTAnalytics-Channel::Update";
+    private static final String CALL_GRAPH_DELETE_TAG = "AWS-IoTAnalytics-Channel::Update-Delete-Tag";
+    private static final String CALL_GRAPH_ADD_TAG = "AWS-IoTAnalytics-Channel::Update-Add-Tag";
 
 
     private Logger logger;
