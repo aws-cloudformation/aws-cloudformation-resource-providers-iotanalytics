@@ -1,0 +1,12 @@
+{
+  "ChannelName": "mychannel3",
+  "Tags": [
+  ],
+  "ChannelStorage": {
+    "CustomerManagedS3": {
+      "Bucket": "invalid",
+      "RoleArn": "invalid",
+      "KeyPrefix": "invalid"
+    }
+  }
+}
