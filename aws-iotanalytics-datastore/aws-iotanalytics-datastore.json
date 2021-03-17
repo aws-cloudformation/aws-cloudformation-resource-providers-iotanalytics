@@ -24,8 +24,8 @@
         "Tags": {
             "type": "array",
             "uniqueItems": false,
-            "minLength": 1,
-            "maxLength": 50,
+            "minItems": 1,
+            "maxItems": 50,
             "items": {
                 "$ref": "#/definitions/Tag"
             }
@@ -181,12 +181,16 @@
         },
         "read": {
             "permissions": [
-                "iotanalytics:DescribeDatastore"
+                "iotanalytics:DescribeDatastore",
+                "iotanalytics:ListTagsForResource"
+
             ]
         },
         "update": {
             "permissions": [
-                "iotanalytics:UpdateDatastore"
+                "iotanalytics:UpdateDatastore",
+                "iotanalytics:TagResource",
+                "iotanalytics:UntagResource"
             ]
         },
         "delete": {

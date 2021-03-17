@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreResponse;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -51,7 +52,7 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
                     proxyClient.client()::createDatastore);
             logger.log(String.format("%s [%s] successfully created", ResourceModel.TYPE_NAME, request.datastoreName()));
             return response;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s [%s] fail to be created: %s", ResourceModel.TYPE_NAME, request.datastoreName(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,
