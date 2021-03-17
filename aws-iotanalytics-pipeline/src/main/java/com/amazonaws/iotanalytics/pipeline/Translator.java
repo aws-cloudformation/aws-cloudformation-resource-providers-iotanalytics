@@ -395,12 +395,12 @@ class Translator {
     }
 
     private static List<software.amazon.awssdk.services.iotanalytics.model.Tag> translateTagListsFromCfn(
-            @Nullable final List<com.amazonaws.iotanalytics.pipeline.Tag> tagList
+            @Nullable final List<com.amazonaws.iotanalytics.pipeline.Tag> cfnTagList
     ) {
-        if (tagList == null) {
+        if (cfnTagList == null) {
             return null;
         } else {
-            return tagList.stream().map(tag ->
+            return cfnTagList.stream().map(tag ->
                     Tag.builder()
                             .key(tag.getKey())
                             .value(tag.getValue())
