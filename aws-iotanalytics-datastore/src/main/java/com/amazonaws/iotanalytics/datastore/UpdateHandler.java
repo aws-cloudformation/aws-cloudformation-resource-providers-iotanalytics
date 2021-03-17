@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.services.cloudwatch.model.InvalidParameterValueException;
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.TagResourceRequest;
 import software.amazon.awssdk.services.iotanalytics.model.TagResourceResponse;
 import software.amazon.awssdk.services.iotanalytics.model.UntagResourceRequest;
@@ -69,7 +70,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                     proxyClient.client()::updateDatastore);
             logger.log(String.format("%s [%s] has successfully been updated", ResourceModel.TYPE_NAME, updateDatastoreRequest.datastoreName()));
             return updateDatastoreResponse;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s [%s] fail to be updated: %s", ResourceModel.TYPE_NAME, updateDatastoreRequest.datastoreName(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,
@@ -194,7 +195,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                     untagResourceRequest, proxyClient.client()::untagResource);
             logger.log(String.format("%s [%s] has successfully been removed tags", ResourceModel.TYPE_NAME, untagResourceRequest.resourceArn()));
             return untagResourceResponse;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s [%s] fail to be removed tags: %s", ResourceModel.TYPE_NAME, untagResourceRequest.resourceArn(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,
@@ -211,7 +212,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                     tagResourceRequest, proxyClient.client()::tagResource);
             logger.log(String.format("%s [%s] has successfully been added tags", ResourceModel.TYPE_NAME, tagResourceRequest.resourceArn()));
             return tagResourceResponse;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s [%s] fail to be added tags: %s", ResourceModel.TYPE_NAME, tagResourceRequest.resourceArn(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,

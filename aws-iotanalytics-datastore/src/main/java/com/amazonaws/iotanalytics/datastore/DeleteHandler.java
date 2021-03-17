@@ -4,6 +4,7 @@ import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
 import software.amazon.awssdk.services.iotanalytics.model.DeleteDatastoreRequest;
 import software.amazon.awssdk.services.iotanalytics.model.DeleteDatastoreResponse;
 import software.amazon.awssdk.services.iotanalytics.model.DescribeDatastoreRequest;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -47,7 +48,7 @@ public class DeleteHandler extends BaseIoTAnalyticsHandler{
                     proxyClient.client()::deleteDatastore);
             logger.log(String.format("%s [%s] successfully deleted", ResourceModel.TYPE_NAME, request.datastoreName()));
             return response;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s [%s] fail to be deleted: %s", ResourceModel.TYPE_NAME, request.datastoreName(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,
@@ -69,7 +70,7 @@ public class DeleteHandler extends BaseIoTAnalyticsHandler{
             return false;
         } catch (final ResourceNotFoundException e) {
             return true;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             throw Translator.translateExceptionToHandlerException(e, OPERATION_READ, model.getDatastoreName());
         }
     }

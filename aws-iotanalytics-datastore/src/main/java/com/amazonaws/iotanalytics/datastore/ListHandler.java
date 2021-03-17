@@ -1,6 +1,7 @@
 package com.amazonaws.iotanalytics.datastore;
 
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.ListDatastoresRequest;
 import software.amazon.awssdk.services.iotanalytics.model.ListDatastoresResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -50,7 +51,7 @@ public class ListHandler extends BaseIoTAnalyticsHandler {
                     .status(OperationStatus.SUCCESS)
                     .nextToken(listDatastoresResponse.nextToken())
                     .build();
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s listing datastores %s.", ResourceModel.TYPE_NAME, e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,

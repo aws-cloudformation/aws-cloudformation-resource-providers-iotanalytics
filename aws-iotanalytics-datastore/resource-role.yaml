@@ -27,6 +27,9 @@ Resources:
                 - "iotanalytics:DeleteDatastore"
                 - "iotanalytics:DescribeDatastore"
                 - "iotanalytics:ListDatastores"
+                - "iotanalytics:ListTagsForResource"
+                - "iotanalytics:TagResource"
+                - "iotanalytics:UntagResource"
                 - "iotanalytics:UpdateDatastore"
                 Resource: "*"
 Outputs:

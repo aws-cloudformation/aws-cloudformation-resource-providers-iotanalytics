@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.iotanalytics.model.DescribeDatastoreReque
 import software.amazon.awssdk.services.iotanalytics.model.DescribeDatastoreResponse;
 import software.amazon.awssdk.services.iotanalytics.model.FileFormatConfiguration;
 import software.amazon.awssdk.services.iotanalytics.model.InvalidRequestException;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.JsonConfiguration;
 import software.amazon.awssdk.services.iotanalytics.model.LimitExceededException;
 import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceResponse;
@@ -26,6 +27,7 @@ import software.amazon.awssdk.services.iotanalytics.model.Tag;
 import software.amazon.awssdk.services.iotanalytics.model.ThrottlingException;
 import software.amazon.awssdk.services.iotanalytics.model.UpdateDatastoreRequest;
 import software.amazon.cloudformation.exceptions.BaseHandlerException;
+import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
@@ -83,7 +85,7 @@ class Translator {
     }
 
     static BaseHandlerException translateExceptionToHandlerException(
-            final Exception e,
+            final IoTAnalyticsException e,
             final String operation,
             @Nullable final String name
     ) {
@@ -101,6 +103,10 @@ class Translator {
         } else if (e instanceof LimitExceededException) {
             throw new CfnServiceLimitExceededException(ResourceModel.TYPE_NAME, e.getMessage());
         } else {
+            if (e.awsErrorDetails() != null
+                    && "AccessDeniedException".equalsIgnoreCase(e.awsErrorDetails().errorCode())) {
+                return new CfnAccessDeniedException(operation, e);
+            }
             return new CfnServiceInternalErrorException(operation, e);
         }
     }
