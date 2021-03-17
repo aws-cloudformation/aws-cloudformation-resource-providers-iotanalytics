@@ -4,6 +4,7 @@ import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
 import software.amazon.awssdk.services.iotanalytics.model.DeleteChannelRequest;
 import software.amazon.awssdk.services.iotanalytics.model.DeleteChannelResponse;
 import software.amazon.awssdk.services.iotanalytics.model.DescribeChannelRequest;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -46,7 +47,7 @@ public class DeleteHandler extends BaseIoTAnalyticsHandler {
                     proxyClient.client()::deleteChannel);
             logger.log(String.format("%s [%s] successfully deleted", ResourceModel.TYPE_NAME, request.channelName()));
             return response;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s [%s] fail to be deleted: %s", ResourceModel.TYPE_NAME, request.channelName(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,
@@ -68,7 +69,7 @@ public class DeleteHandler extends BaseIoTAnalyticsHandler {
             return false;
         } catch (final ResourceNotFoundException e) {
             return true;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             throw Translator.translateExceptionToHandlerException(e, OPERATION_READ, model.getChannelName());
         }
     }

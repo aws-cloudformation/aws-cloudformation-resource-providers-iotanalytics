@@ -21,8 +21,8 @@
         "Tags": {
             "type": "array",
             "uniqueItems": false,
-            "minLength": 1,
-            "maxLength": 50,
+            "minItems": 1,
+            "maxItems": 50,
             "items": {
                 "$ref": "#/definitions/Tag"
             }

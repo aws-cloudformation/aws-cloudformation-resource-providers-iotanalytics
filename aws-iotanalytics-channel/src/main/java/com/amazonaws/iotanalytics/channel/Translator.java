@@ -6,6 +6,7 @@ import software.amazon.awssdk.services.iotanalytics.model.ChannelStorage;
 import software.amazon.awssdk.services.iotanalytics.model.CreateChannelRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CustomerManagedChannelS3Storage;
 import software.amazon.awssdk.services.iotanalytics.model.DeleteChannelRequest;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.RetentionPeriod;
 
 import software.amazon.awssdk.services.iotanalytics.model.DescribeChannelRequest;
@@ -21,6 +22,7 @@ import software.amazon.awssdk.services.iotanalytics.model.Tag;
 import software.amazon.awssdk.services.iotanalytics.model.ThrottlingException;
 import software.amazon.awssdk.services.iotanalytics.model.UpdateChannelRequest;
 import software.amazon.cloudformation.exceptions.BaseHandlerException;
+import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnAlreadyExistsException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
@@ -75,7 +77,7 @@ public class Translator {
     }
 
     static BaseHandlerException translateExceptionToHandlerException(
-            final Exception e,
+            final IoTAnalyticsException e,
             final String operation,
             @Nullable final String name
     ) {
@@ -89,10 +91,14 @@ public class Translator {
         } else if (e instanceof ThrottlingException) {
             return new CfnThrottlingException(operation, e);
         } else if (e instanceof ServiceUnavailableException) {
-            throw new CfnGeneralServiceException(operation, e);
+            return new CfnGeneralServiceException(operation, e);
         } else if (e instanceof LimitExceededException) {
-            throw new CfnServiceLimitExceededException(ResourceModel.TYPE_NAME, e.getMessage());
+            return new CfnServiceLimitExceededException(ResourceModel.TYPE_NAME, e.getMessage());
         } else {
+            if (e.awsErrorDetails() != null
+                    && "AccessDeniedException".equalsIgnoreCase(e.awsErrorDetails().errorCode())) {
+                return new CfnAccessDeniedException(operation, e);
+            }
             return new CfnServiceInternalErrorException(operation, e);
         }
     }
