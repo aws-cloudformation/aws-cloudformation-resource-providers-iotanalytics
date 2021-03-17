@@ -99,9 +99,9 @@ class Translator {
         } else if (e instanceof ThrottlingException) {
             return new CfnThrottlingException(operation, e);
         } else if (e instanceof ServiceUnavailableException) {
-            throw new CfnGeneralServiceException(operation, e);
+            return new CfnGeneralServiceException(operation, e);
         } else if (e instanceof LimitExceededException) {
-            throw new CfnServiceLimitExceededException(ResourceModel.TYPE_NAME, e.getMessage());
+            return new CfnServiceLimitExceededException(ResourceModel.TYPE_NAME, e.getMessage());
         } else {
             if (e.awsErrorDetails() != null
                     && "AccessDeniedException".equalsIgnoreCase(e.awsErrorDetails().errorCode())) {
