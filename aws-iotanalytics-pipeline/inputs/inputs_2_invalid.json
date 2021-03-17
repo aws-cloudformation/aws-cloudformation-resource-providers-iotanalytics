@@ -1,0 +1,98 @@
+{
+  "PipelineName": "mypipeline3",
+  "Tags": [
+    {
+      "Key": "key1",
+      "Value": "value1"
+    },
+    {
+      "Key": "key2",
+      "Value": "value2"
+    }
+  ],
+  "PipelineActivities": [
+    {
+      "Channel": {
+        "ChannelName": "cfn_channel",
+        "Name": "channel_activity",
+        "Next": "select_attr_activity"
+      }
+    },
+    {
+      "SelectAttributes": {
+        "Name": "select_attr_activity",
+        "Attributes": [
+          "velocity",
+          "temperature"
+        ],
+        "Next": "add_attr_activity"
+      }
+    },
+    {
+      "AddAttributes": {
+        "Name": "add_attr_activity",
+        "Attributes": {
+          "velocity": "new_velocity",
+          "temperature": 123
+        },
+        "Next": "remove_attr_activity"
+      }
+    },
+    {
+      "RemoveAttributes": {
+        "Name": "remove_attr_activity",
+        "Attributes": [
+          "new_velocity"
+        ],
+        "Next": "device_registry_enrich_activity"
+      }
+    },
+    {
+      "DeviceRegistryEnrich": {
+        "Name": "device_registry_enrich_activity",
+        "ThingName": "a_thing_name",
+        "Attribute": "device_registry",
+        "RoleArn": "arn:aws:iam::618235686450:role/IoT-Enrich-Role",
+        "Next": "device_shadow_enrich_activity"
+      }
+    },
+    {
+      "DeviceShadowEnrich": {
+        "Name": "device_shadow_enrich_activity",
+        "ThingName": "b_thing_name",
+        "Attribute": "device_shadow",
+        "RoleArn": "arn:aws:iam::618235686450:role/IoT-Enrich-Role",
+        "Next": "filter_activity"
+      }
+    },
+    {
+      "Filter": {
+        "Name": "filter_activity",
+        "Filter": "new_temperature > 10",
+        "Next": "math_activity"
+      }
+    },
+    {
+      "Math": {
+        "Name": "math_activity",
+        "Math": "(tempF - 32) / 2",
+        "Attribute": "tempC",
+        "Next": "lambda_activity"
+      }
+    },
+    {
+      "Lambda": {
+        "Name": "lambda_activity",
+        "BatchSize": 5,
+        "LambdaName": "a_lambda_function+-/",
+        "Next": "datastore_activity"
+      }
+    },
+    {
+      "Datastore": {
+        "DatastoreName": "cfn_datastore_1",
+        "Name": "datastore_activity"
+      }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "PipelineName": "mypipeline2",
+  "Tags": [
+    {
+      "Key": "key2",
+      "Value": "value22"
+    },
+    {
+      "Key": "key3",
+      "Value": "value3"
+    },
+    {
+      "Key": "key4",
+      "Value": "value4"
+    }
+  ],
+  "PipelineActivities": [
+    {
+      "Channel": {
+        "ChannelName": "cfn_channel",
+        "Name": "channel_activity",
+        "Next": "add_attr_activity"
+      }
+    },
+    {
+      "AddAttributes": {
+        "Name": "add_attr_activity",
+        "Attributes": {
+          "velocity": "new_velocity",
+          "temperature": "new_temperature"
+        },
+        "Next": "device_registry_enrich_activity"
+      }
+    },
+    {
+      "DeviceRegistryEnrich": {
+        "Name": "device_registry_enrich_activity",
+        "ThingName": "a_thing_name",
+        "Attribute": "device_registry",
+        "RoleArn": "arn:aws:iam::618235686450:role/IoT-Enrich-Role",
+        "Next": "filter_activity"
+      }
+    },
+    {
+      "Filter": {
+        "Name": "filter_activity",
+        "Filter": "new_temperature > 10",
+        "Next": "lambda_activity"
+      }
+    },
+    {
+      "Lambda": {
+        "Name": "lambda_activity",
+        "BatchSize": 5,
+        "LambdaName": "a_lambda_function",
+        "Next": "datastore_activity"
+      }
+    },
+    {
+      "Datastore": {
+        "DatastoreName": "cfn_datastore_1",
+        "Name": "datastore_activity"
+      }
+    }
+  ]
+}
