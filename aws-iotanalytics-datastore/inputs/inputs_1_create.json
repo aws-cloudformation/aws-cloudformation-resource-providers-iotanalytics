@@ -1,0 +1,36 @@
+{
+    "DatastoreName": "mydatastore1",
+    "Tags": [
+        {
+            "Key": "key1",
+            "Value": "value1"
+        },
+        {
+            "Key": "key2",
+            "Value": "value2"
+        }
+    ],
+    "DatastoreStorage": {
+        "CustomerManagedS3": {
+            "Bucket": "my-iot-analytics-bucket",
+            "RoleArn": "arn:aws:iam::618235686450:role/IoT-CMS-Role",
+            "KeyPrefix": "iota-prefix/"
+        }
+    },
+    "FileFormatConfiguration": {
+        "ParquetConfiguration": {
+            "SchemaDefinition": {
+                "Columns": [
+                    {
+                        "Name": "id",
+                        "Type": "bigint"
+                    },
+                    {
+                        "Name": "temp",
+                        "Type": "double"
+                    }
+                ]
+            }
+        }
+    }
+}
