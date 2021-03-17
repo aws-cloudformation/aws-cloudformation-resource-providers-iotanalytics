@@ -3,6 +3,7 @@ package com.amazonaws.iotanalytics.channel;
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
 import software.amazon.awssdk.services.iotanalytics.model.CreateChannelRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CreateChannelResponse;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
@@ -53,7 +54,7 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
                     proxyClient.client()::createChannel);
             logger.log(String.format("%s [%s] successfully created", ResourceModel.TYPE_NAME, request.channelName()));
             return response;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s [%s] fail to be created: %s", ResourceModel.TYPE_NAME, request.channelName(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,

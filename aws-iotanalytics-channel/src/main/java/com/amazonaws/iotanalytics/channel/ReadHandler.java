@@ -3,6 +3,7 @@ package com.amazonaws.iotanalytics.channel;
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
 import software.amazon.awssdk.services.iotanalytics.model.DescribeChannelRequest;
 import software.amazon.awssdk.services.iotanalytics.model.DescribeChannelResponse;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -42,7 +43,7 @@ public class ReadHandler extends BaseIoTAnalyticsHandler {
                                         sdkProxyClient.client()::listTagsForResource);
                         logger.log(String.format("%s [%s] has successfully been listed tags", ResourceModel.TYPE_NAME, describeResponse.channel().arn()));
                         return ProgressEvent.defaultSuccessHandler(Translator.translateFromDescribeResponse(describeResponse, listTagsForResourceResponse));
-                    } catch (final Exception e) {
+                    } catch (final IoTAnalyticsException e) {
                         logger.log(String.format("ERROR %s [%s] fail to be listed tags: %s", ResourceModel.TYPE_NAME, describeResponse.channel().arn(), e.toString()));
                         throw Translator.translateExceptionToHandlerException(
                                 e,
@@ -58,7 +59,7 @@ public class ReadHandler extends BaseIoTAnalyticsHandler {
             final DescribeChannelResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::describeChannel);
             logger.log(String.format("%s [%s] has successfully been read", ResourceModel.TYPE_NAME, request.channelName()));
             return response;
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s [%s] fail to be read: %s", ResourceModel.TYPE_NAME, request.channelName(), e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,

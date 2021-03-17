@@ -1,6 +1,7 @@
 package com.amazonaws.iotanalytics.channel;
 
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
+import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.ListChannelsRequest;
 import software.amazon.awssdk.services.iotanalytics.model.ListChannelsResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -48,7 +49,7 @@ public class ListHandler extends BaseIoTAnalyticsHandler {
                     .status(OperationStatus.SUCCESS)
                     .nextToken(listChannelsResponse.nextToken())
                     .build();
-        } catch (final Exception e) {
+        } catch (final IoTAnalyticsException e) {
             logger.log(String.format("ERROR %s listing channel %s.", ResourceModel.TYPE_NAME, e.toString()));
             throw Translator.translateExceptionToHandlerException(
                     e,
