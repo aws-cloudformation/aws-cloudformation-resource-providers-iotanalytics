@@ -1,0 +1,40 @@
+{
+  "PipelineName": "mypipeline1",
+  "Tags": [
+    {
+      "Key": "key2",
+      "Value": "value22"
+    },
+    {
+      "Key": "key3",
+      "Value": "value3"
+    },
+    {
+      "Key": "key4",
+      "Value": "value4"
+    }
+  ],
+  "PipelineActivities": [
+    {
+      "Channel": {
+        "ChannelName": "cfn_channel",
+        "Name": "channel_activity",
+        "Next": "math_activity"
+      }
+    },
+    {
+      "Math": {
+        "Name": "math_activity",
+        "Math": "(tempF - 32) / 2",
+        "Attribute": "tempC",
+        "Next": "datastore_activity"
+      }
+    },
+    {
+      "Datastore": {
+        "DatastoreName": "cfn_datastore_2",
+        "Name": "datastore_activity"
+      }
+    }
+  ]
+}

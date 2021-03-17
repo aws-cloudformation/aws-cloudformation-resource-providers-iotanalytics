@@ -1,0 +1,11 @@
+{
+  "PipelineName": "mypipeline2",
+  "PipelineActivities": [
+    {
+      "Channel": {
+        "ChannelName": "cfn_channel",
+        "Name": "channel_activity"
+      }
+    }
+  ]
+}
