@@ -1,4 +1,4 @@
-package com.amazonaws.iotanalytics.channel;
+package com.amazonaws.iotanalytics.dataset;
 
 import com.amazonaws.util.StringUtils;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
@@ -18,6 +18,7 @@ class ClientBuilder {
 
         synchronized (ClientBuilder.class) {
             final Region region = Region.of(getEnvironmentValue("AWS_REGION", "us-west-2"));
+
             ioTAnalyticsClient = IoTAnalyticsClient.builder().region(region)
                     .overrideConfiguration(ClientOverrideConfiguration.builder()
                             .retryPolicy(RetryPolicy.builder().numRetries(3).build())

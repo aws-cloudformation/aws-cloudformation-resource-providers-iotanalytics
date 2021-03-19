@@ -1,0 +1,71 @@
+{
+  "DatasetName": "mydataset2",
+  "Tags": [
+    {
+      "Key": "key1",
+      "Value": "value1"
+    },
+    {
+      "Key": "key2",
+      "Value": "value2"
+    }
+  ],
+  "ContentDeliveryRules": [
+    {
+      "EntryName": "custom/fileName.csv",
+      "Destination": {
+        "S3DestinationConfiguration": {
+          "Bucket": "my-iot-analytics-bucket",
+          "RoleArn": "arn:aws:iam::618235686450:role/IoT-CMS-Role",
+          "Key": "iota-dataset"
+        }
+      }
+    }
+  ],
+  "Triggers": [
+    {
+      "Schedule": {
+        "ScheduleExpression": "cron(0/5 * * * ? *)"
+      }
+    }
+  ],
+  "VersioningConfiguration": {
+    "MaxVersions": 10,
+    "Unlimited": false
+  },
+  "Actions": [
+    {
+      "ActionName": "container_action",
+      "ContainerAction": {
+        "Image": "618235686450.dkr.ecr.us-east-1.amazonaws.com/container",
+        "ExecutionRoleArn": "arn:aws:iam::618235686450:role/IoT-Image-Role",
+        "ResourceConfiguration": {
+          "VolumeSizeInGB": 1,
+          "ComputeType": "ACU_2"
+        },
+        "Variables": [
+          {
+            "VariableName": "var1",
+            "OutputFileUriValue": {
+              "FileName": "fileName.csv"
+            }
+          },
+          {
+            "VariableName": "var2",
+            "DoubleValue": 9.9
+          },
+          {
+            "VariableName": "var3",
+            "DatasetContentVersionValue": {
+              "DatasetName": "datasetName"
+            }
+          },
+          {
+            "VariableName": "var4",
+            "StringValue": "str"
+          }
+        ]
+      }
+    }
+  ]
+}
