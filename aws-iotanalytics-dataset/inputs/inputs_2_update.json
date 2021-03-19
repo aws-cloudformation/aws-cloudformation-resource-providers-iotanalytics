@@ -1,0 +1,78 @@
+{
+  "DatasetName": "mydataset2",
+  "Tags": [
+    {
+      "Key": "key1",
+      "Value": "value1"
+    },
+    {
+      "Key": "key2",
+      "Value": "value2"
+    },
+    {
+      "Key": "key3",
+      "Value": "value3"
+    }
+  ],
+  "ContentDeliveryRules": [
+    {
+      "EntryName": "custom/fileName1.csv",
+      "Destination": {
+        "IotEventsDestinationConfiguration": {
+          "InputName": "ioteventinput",
+          "RoleArn": "arn:aws:iam::618235686450:role/IoT-CMS-Role"
+        }
+      }
+    }
+  ],
+  "Triggers": [
+    {
+      "Schedule": {
+        "ScheduleExpression": "cron(15 10 * * ? *)"
+      }
+    }
+  ],
+  "VersioningConfiguration": {
+    "MaxVersions": 11,
+    "Unlimited": false
+  },
+  "RetentionPeriod": {
+    "NumberOfDays": 30,
+    "Unlimited": false
+  },
+  "Actions": [
+    {
+      "ActionName": "container_action",
+      "ContainerAction": {
+        "Image": "618235686450.dkr.ecr.us-east-1.amazonaws.com/container",
+        "ExecutionRoleArn": "arn:aws:iam::618235686450:role/IoT-Image-Role",
+        "ResourceConfiguration": {
+          "VolumeSizeInGB": 1,
+          "ComputeType": "ACU_1"
+        },
+        "Variables": [
+          {
+            "VariableName": "var1",
+            "OutputFileUriValue": {
+              "FileName": "fileName1.csv"
+            }
+          },
+          {
+            "VariableName": "var2",
+            "DoubleValue": 19.9
+          },
+          {
+            "VariableName": "var3",
+            "DatasetContentVersionValue": {
+              "DatasetName": "datasetName1"
+            }
+          },
+          {
+            "VariableName": "var4",
+            "StringValue": "str1"
+          }
+        ]
+      }
+    }
+  ]
+}
