@@ -13,14 +13,14 @@
   "PipelineActivities": [
     {
       "Channel": {
-        "ChannelName": "cfn_channel",
+        "ChannelName": "cfn_testing_channel",
         "Name": "channel_activity",
         "Next": "datastore_activity"
       }
     },
     {
       "Datastore": {
-        "DatastoreName": "cfn_datastore_1",
+        "DatastoreName": "cfn_testing_datastore1",
         "Name": "datastore_activity"
       }
     }

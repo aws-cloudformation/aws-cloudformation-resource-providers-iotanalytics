@@ -17,7 +17,7 @@
   "PipelineActivities": [
     {
       "Channel": {
-        "ChannelName": "cfn_channel",
+        "ChannelName": "cfn_testing_channel",
         "Name": "channel_activity",
         "Next": "math_activity"
       }
@@ -32,7 +32,7 @@
     },
     {
       "Datastore": {
-        "DatastoreName": "cfn_datastore_2",
+        "DatastoreName": "cfn_testing_datastore2",
         "Name": "datastore_activity"
       }
     }

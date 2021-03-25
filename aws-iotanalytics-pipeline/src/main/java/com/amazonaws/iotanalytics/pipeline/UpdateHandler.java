@@ -4,6 +4,8 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.services.cloudwatch.model.InvalidParameterValueException;
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
+import software.amazon.awssdk.services.iotanalytics.model.DescribePipelineRequest;
+import software.amazon.awssdk.services.iotanalytics.model.DescribePipelineResponse;
 import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.TagResourceRequest;
 import software.amazon.awssdk.services.iotanalytics.model.TagResourceResponse;
@@ -15,7 +17,6 @@ import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
-import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
@@ -32,6 +33,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
     private static final String OPERATION_PIPELINE = "UpdatePipeline";
     private static final String OPERATION_DELETE_TAG = "UpdatePipeline_DeleteTags";
     private static final String OPERATION_ADD_TAG = "UpdatePipeline_AddTags";
+    private static final String OPERATION_DESCRIBE = "DescribePipeline";
 
     private static final String CALL_GRAPH_PIPELINE = "AWS-IoTAnalytics-Pipeline::Update";
     private static final String CALL_GRAPH_DELETE_TAG = "AWS-IoTAnalytics-Pipeline::Update-Delete-Tag";
@@ -99,6 +101,22 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                 .build());
     }
 
+    private String getPipelineArn(final DescribePipelineRequest request,
+                                 final ProxyClient<IoTAnalyticsClient> proxyClient) {
+        try {
+            final DescribePipelineResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::describePipeline);
+            final String pipelineArn = response.pipeline().arn();
+            logger.log(String.format("Successfully read arn for %s [%s].", com.amazonaws.iotanalytics.pipeline.ResourceModel.TYPE_NAME, request.pipelineName()));
+            return pipelineArn;
+        } catch (final IoTAnalyticsException e) {
+            logger.log(String.format("ERROR %s [%s] failed to read arn: %s", com.amazonaws.iotanalytics.pipeline.ResourceModel.TYPE_NAME, request.pipelineName(), e.toString()));
+            throw com.amazonaws.iotanalytics.pipeline.Translator.translateExceptionToHandlerException(
+                e,
+                OPERATION_DESCRIBE,
+                request.pipelineName());
+        }
+    }
+
     private ProgressEvent<ResourceModel, CallbackContext> updateTags(
             final AmazonWebServicesClientProxy proxy,
             final ProxyClient<IoTAnalyticsClient> proxyClient,
@@ -111,6 +129,10 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         final Map<String, String> tagsToDelete = getTagsToDelete(oldTagsMap, newTagsMap);
         final Map<String, String> tagsToCreate = getTagsToCreate(oldTagsMap, newTagsMap);
 
+        String pipelineArn = getPipelineArn(
+            Translator.translateToDescribePipelineRequest(model),
+            proxyClient);
+
         return progress
                 .then(progress1 -> {
                     if (!tagsToDelete.isEmpty()) {
@@ -118,7 +140,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                                 .translateToServiceRequest(resourceModel ->
                                         UntagResourceRequest
                                                 .builder()
-                                                .resourceArn(preModel.getId())
+                                                .resourceArn(pipelineArn)
                                                 .tagKeys(tagsToDelete.keySet())
                                                 .build())
                                 .makeServiceCall(this::deleteTags)
@@ -132,7 +154,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                                 .translateToServiceRequest(resourceModel ->
                                         TagResourceRequest
                                                 .builder()
-                                                .resourceArn(preModel.getId())
+                                                .resourceArn(pipelineArn)
                                                 .tags(tagsMapToList(tagsToCreate))
                                                 .build())
                                 .makeServiceCall(this::addTags)

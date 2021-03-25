@@ -4,6 +4,9 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.services.cloudwatch.model.InvalidParameterValueException;
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
+import software.amazon.awssdk.services.iotanalytics.model.DescribeChannelRequest;
+import software.amazon.awssdk.services.iotanalytics.model.DescribeDatasetRequest;
+import software.amazon.awssdk.services.iotanalytics.model.DescribeDatasetResponse;
 import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.TagResourceRequest;
 import software.amazon.awssdk.services.iotanalytics.model.TagResourceResponse;
@@ -31,6 +34,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
     private static final String OPERATION_DATASET = "UpdateDataset";
     private static final String OPERATION_DELETE_TAG = "UpdateDataset_DeleteTags";
     private static final String OPERATION_ADD_TAG = "UpdateDataset_AddTags";
+    private static final String OPERATION_DESCRIBE = "DescribeDataset";
 
     private static final String CALL_GRAPH_DATASET = "AWS-IoTAnalytics-Dataset::Update";
     private static final String CALL_GRAPH_DELETE_TAG = "AWS-IoTAnalytics-Dataset::Update-Delete-Tag";
@@ -40,11 +44,11 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-            final AmazonWebServicesClientProxy proxy,
-            final ResourceHandlerRequest<ResourceModel> request,
-            final CallbackContext callbackContext,
-            final ProxyClient<IoTAnalyticsClient> proxyClient,
-            final Logger logger) {
+        final AmazonWebServicesClientProxy proxy,
+        final ResourceHandlerRequest<ResourceModel> request,
+        final CallbackContext callbackContext,
+        final ProxyClient<IoTAnalyticsClient> proxyClient,
+        final Logger logger) {
         this.logger = logger;
 
         final ResourceModel prevModel = request.getPreviousResourceState();
@@ -97,6 +101,22 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                 .build());
     }
 
+    private String getDatasetArn(final DescribeDatasetRequest request,
+                                 final ProxyClient<IoTAnalyticsClient> proxyClient) {
+        try {
+            final DescribeDatasetResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::describeDataset);
+            final String datasetArn = response.dataset().arn();
+            logger.log(String.format("Successfully read arn for %s [%s].", ResourceModel.TYPE_NAME, request.datasetName()));
+            return datasetArn;
+        } catch (final IoTAnalyticsException e) {
+            logger.log(String.format("ERROR %s [%s] failed to read arn: %s", ResourceModel.TYPE_NAME, request.datasetName(), e.toString()));
+            throw com.amazonaws.iotanalytics.dataset.Translator.translateExceptionToHandlerException(
+                e,
+                OPERATION_DESCRIBE,
+                request.datasetName());
+        }
+    }
+
     private ProgressEvent<ResourceModel, CallbackContext> updateTags(
             final AmazonWebServicesClientProxy proxy,
             final ProxyClient<IoTAnalyticsClient> proxyClient,
@@ -109,6 +129,10 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         final Map<String, String> tagsToDelete = getTagsToDelete(oldTagsMap, newTagsMap);
         final Map<String, String> tagsToCreate = getTagsToCreate(oldTagsMap, newTagsMap);
 
+        String datasetArn = getDatasetArn(
+            Translator.translateToDescribeDatasetRequest(model),
+            proxyClient);
+
         return progress
                 .then(progress1 -> {
                     if (!tagsToDelete.isEmpty()) {
@@ -116,7 +140,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                                 .translateToServiceRequest(resourceModel ->
                                         UntagResourceRequest
                                                 .builder()
-                                                .resourceArn(preModel.getId())
+                                                .resourceArn(datasetArn)
                                                 .tagKeys(tagsToDelete.keySet())
                                                 .build())
                                 .makeServiceCall(this::deleteTags)
@@ -130,7 +154,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
                                 .translateToServiceRequest(resourceModel ->
                                         TagResourceRequest
                                                 .builder()
-                                                .resourceArn(preModel.getId())
+                                                .resourceArn(datasetArn)
                                                 .tags(tagsMapToList(tagsToCreate))
                                                 .build())
                                 .makeServiceCall(this::addTags)

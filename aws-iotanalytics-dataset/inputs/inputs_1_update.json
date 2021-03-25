@@ -14,8 +14,8 @@
     {
       "ActionName": "container_action",
       "ContainerAction": {
-        "Image": "618235686450.dkr.ecr.us-east-1.amazonaws.com/container",
-        "ExecutionRoleArn": "arn:aws:iam::618235686450:role/IoT-Image-Role",
+        "Image": "<account_id>.dkr.ecr.us-east-1.amazonaws.com/cfn-testing-container",
+        "ExecutionRoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
         "ResourceConfiguration": {
           "VolumeSizeInGB": 1,
           "ComputeType": "ACU_2"

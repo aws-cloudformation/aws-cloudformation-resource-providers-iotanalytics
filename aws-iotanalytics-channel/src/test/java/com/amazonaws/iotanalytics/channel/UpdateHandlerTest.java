@@ -86,47 +86,47 @@ public class UpdateHandlerTest extends AbstractTestBase {
         handler = new UpdateHandler();
 
         preModel = ResourceModel.builder()
-                .channelName(TEST_CHANNEL_NAME)
-                .id(TEST_CHANNEL_ID)
-                .retentionPeriod(RetentionPeriod.builder().numberOfDays(TEST_DAYS).build())
-                .tags(Arrays.asList(Tag.builder().key(TEST_KEY1).value(TEST_VALUE1).build(),
-                        Tag.builder().key(TEST_KEY2).value(TEST_VALUE2).build()))
-                .build();
+            .channelName(TEST_CHANNEL_NAME)
+            .id(TEST_CHANNEL_ID)
+            .retentionPeriod(RetentionPeriod.builder().numberOfDays(TEST_DAYS).build())
+            .tags(Arrays.asList(Tag.builder().key(TEST_KEY1).value(TEST_VALUE1).build(),
+                Tag.builder().key(TEST_KEY2).value(TEST_VALUE2).build()))
+            .build();
 
         newModel = ResourceModel.builder()
-                .channelName(TEST_CHANNEL_NAME)
-                .channelStorage(ChannelStorage
-                        .builder()
-                        .serviceManagedS3(new HashMap<>())
-                        .build())
-                .tags(Arrays.asList(Tag.builder().key(TEST_KEY3).value(TEST_VALUE3).build(),
-                        Tag.builder().key(TEST_KEY2).value(TEST_VALUE22).build()))
-                .build();
+            .channelName(TEST_CHANNEL_NAME)
+            .channelStorage(ChannelStorage
+                .builder()
+                .serviceManagedS3(new HashMap<>())
+                .build())
+            .tags(Arrays.asList(Tag.builder().key(TEST_KEY3).value(TEST_VALUE3).build(),
+                Tag.builder().key(TEST_KEY2).value(TEST_VALUE22).build()))
+            .build();
 
         describeChannelResponseFull = DescribeChannelResponse.builder().channel(
-                Channel.builder()
-                        .name(TEST_CHANNEL_NAME)
-                        .arn(TEST_CHANNEL_ARN)
-                        .storage(software.amazon.awssdk.services.iotanalytics.model.ChannelStorage
-                                .builder()
-                                .serviceManagedS3(ServiceManagedChannelS3Storage.builder().build())
-                                .build())
-                        .retentionPeriod(software.amazon.awssdk.services.iotanalytics.model.RetentionPeriod
-                                .builder()
-                                .numberOfDays(TEST_DAYS)
-                                .build())
-                        .build())
-                .build();
+            Channel.builder()
+                .name(TEST_CHANNEL_NAME)
+                .arn(TEST_CHANNEL_ARN)
+                .storage(software.amazon.awssdk.services.iotanalytics.model.ChannelStorage
+                    .builder()
+                    .serviceManagedS3(ServiceManagedChannelS3Storage.builder().build())
+                    .build())
+                .retentionPeriod(software.amazon.awssdk.services.iotanalytics.model.RetentionPeriod
+                    .builder()
+                    .numberOfDays(TEST_DAYS)
+                    .build())
+                .build())
+            .build();
 
         listTagsForResourceResponseFull = ListTagsForResourceResponse.builder()
-                .tags(Arrays.asList(software.amazon.awssdk.services.iotanalytics.model.Tag.builder().key(TEST_KEY1).value(TEST_VALUE1).build(),
-                        software.amazon.awssdk.services.iotanalytics.model.Tag.builder().key(TEST_KEY2).value(TEST_VALUE22).build(),
-                        software.amazon.awssdk.services.iotanalytics.model.Tag.builder().key(TEST_KEY3).value(TEST_VALUE3).build()))
-                .build();
+            .tags(Arrays.asList(software.amazon.awssdk.services.iotanalytics.model.Tag.builder().key(TEST_KEY1).value(TEST_VALUE1).build(),
+                software.amazon.awssdk.services.iotanalytics.model.Tag.builder().key(TEST_KEY2).value(TEST_VALUE22).build(),
+                software.amazon.awssdk.services.iotanalytics.model.Tag.builder().key(TEST_KEY3).value(TEST_VALUE3).build()))
+            .build();
 
         describeChannelResponseSimple = DescribeChannelResponse.builder()
-                .channel(Channel.builder().name(TEST_CHANNEL_NAME).build())
-                .build();
+            .channel(Channel.builder().name(TEST_CHANNEL_NAME).build())
+            .build();
 
         listTagsForResourceResponseSimple = ListTagsForResourceResponse.builder().build();
     }
@@ -135,9 +135,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
     public void GIVEN_request_WHEN_call_handleRequest_THEN_return_success() {
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(newModel)
-                .previousResourceState(preModel)
-                .build();
+            .desiredResourceState(newModel)
+            .previousResourceState(preModel)
+            .build();
 
         when(proxyClient.client().updateChannel(updateChannelRequestArgumentCaptor.capture())).thenReturn(UpdateChannelResponse.builder().build());
 
@@ -151,7 +151,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         // WHEN
         final ProgressEvent<ResourceModel, CallbackContext> response
-                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         // THEN
         final UpdateChannelRequest updateChannelRequest = updateChannelRequestArgumentCaptor.getValue();
@@ -209,13 +209,13 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceModel newModel = ResourceModel.builder().channelName("name2").build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(newModel)
-                .previousResourceState(preModel)
-                .build();
+            .desiredResourceState(newModel)
+            .previousResourceState(preModel)
+            .build();
 
         // WHEN / THEN
         assertThrows(CfnNotUpdatableException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client(), never()).updateChannel(any(UpdateChannelRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
@@ -231,13 +231,13 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceModel newModel = ResourceModel.builder().channelName("name1").id("id2").build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(newModel)
-                .previousResourceState(preModel)
-                .build();
+            .desiredResourceState(newModel)
+            .previousResourceState(preModel)
+            .build();
 
         // WHEN / THEN
         assertThrows(CfnNotUpdatableException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client(), never()).updateChannel(any(UpdateChannelRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
@@ -253,22 +253,22 @@ public class UpdateHandlerTest extends AbstractTestBase {
         final ResourceModel newModel = ResourceModel.builder().channelName(TEST_CHANNEL_NAME).id(TEST_CHANNEL_ID).build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(newModel)
-                .previousResourceState(preModel)
-                .build();
+            .desiredResourceState(newModel)
+            .previousResourceState(preModel)
+            .build();
 
         when(proxyClient.client().describeChannel(any(DescribeChannelRequest.class))).thenReturn(describeChannelResponseSimple);
         when(proxyClient.client().listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(listTagsForResourceResponseSimple);
 
         // WHEN
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+            handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         // THEN
         verify(proxyClient.client(), times(1)).updateChannel(any(UpdateChannelRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
         verify(proxyClient.client(), never()).tagResource(any(TagResourceRequest.class));
-        verify(proxyClient.client(), times(1)).describeChannel(any(DescribeChannelRequest.class));
+        verify(proxyClient.client(), times(2)).describeChannel(any(DescribeChannelRequest.class));
         verify(proxyClient.client(), times(1)).listTagsForResource(any(ListTagsForResourceRequest.class));
 
         assertThat(response).isNotNull();
@@ -286,15 +286,15 @@ public class UpdateHandlerTest extends AbstractTestBase {
     public void GIVEN_iota_update_exception_WHEN_call_handleRequest_THEN_throw_Exception() {
         // GIVEN
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(newModel)
-                .previousResourceState(preModel)
-                .build();
+            .desiredResourceState(newModel)
+            .previousResourceState(preModel)
+            .build();
 
         when(proxyClient.client().updateChannel(updateChannelRequestArgumentCaptor.capture())).thenThrow(InvalidRequestException.builder().build());
 
         // WHEN / THEN
         assertThrows(CfnInvalidRequestException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         assertThat(updateChannelRequestArgumentCaptor.getValue().channelName()).isEqualTo(TEST_CHANNEL_NAME);
         verify(proxyClient.client(), times(1)).updateChannel(any(UpdateChannelRequest.class));
@@ -308,20 +308,21 @@ public class UpdateHandlerTest extends AbstractTestBase {
     public void GIVEN_iota_untag_exception_WHEN_call_handleRequest_THEN_throw_Exception() {
         // GIVEN
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(newModel)
-                .previousResourceState(preModel)
-                .build();
+            .desiredResourceState(newModel)
+            .previousResourceState(preModel)
+            .build();
 
         when(proxyClient.client().updateChannel(any(UpdateChannelRequest.class))).thenReturn(UpdateChannelResponse.builder().build());
         when(proxyClient.client().untagResource(any(UntagResourceRequest.class))).thenThrow(LimitExceededException.builder().build());
+        when(proxyClient.client().describeChannel(any(DescribeChannelRequest.class))).thenReturn(describeChannelResponseSimple);
         // WHEN / THEN
         assertThrows(CfnServiceLimitExceededException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client(), times(1)).updateChannel(any(UpdateChannelRequest.class));
         verify(proxyClient.client(), times(1)).untagResource(any(UntagResourceRequest.class));
+        verify(proxyClient.client(), times(1)).describeChannel(any(DescribeChannelRequest.class));
         verify(proxyClient.client(), never()).tagResource(any(TagResourceRequest.class));
-        verify(proxyClient.client(), never()).describeChannel(any(DescribeChannelRequest.class));
         verify(proxyClient.client(), never()).listTagsForResource(any(ListTagsForResourceRequest.class));
     }
 
@@ -329,22 +330,23 @@ public class UpdateHandlerTest extends AbstractTestBase {
     public void GIVEN_iota_tag_exception_WHEN_call_handleRequest_THEN_throw_Exception() {
         // GIVEN
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-                .desiredResourceState(newModel)
-                .previousResourceState(preModel)
-                .build();
+            .desiredResourceState(newModel)
+            .previousResourceState(preModel)
+            .build();
 
         when(proxyClient.client().updateChannel(any(UpdateChannelRequest.class))).thenReturn(UpdateChannelResponse.builder().build());
         when(proxyClient.client().untagResource(any(UntagResourceRequest.class))).thenReturn(UntagResourceResponse.builder().build());
         when(proxyClient.client().tagResource(any(TagResourceRequest.class))).thenThrow(ServiceUnavailableException.builder().build());
+        when(proxyClient.client().describeChannel(any(DescribeChannelRequest.class))).thenReturn(describeChannelResponseSimple);
 
         // WHEN / THEN
         assertThrows(CfnGeneralServiceException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
 
         verify(proxyClient.client(), times(1)).updateChannel(any(UpdateChannelRequest.class));
         verify(proxyClient.client(), times(1)).untagResource(any(UntagResourceRequest.class));
         verify(proxyClient.client(), times(1)).tagResource(any(TagResourceRequest.class));
-        verify(proxyClient.client(), never()).describeChannel(any(DescribeChannelRequest.class));
+        verify(proxyClient.client(), times(1)).describeChannel(any(DescribeChannelRequest.class));
         verify(proxyClient.client(), never()).listTagsForResource(any(ListTagsForResourceRequest.class));
     }
 }

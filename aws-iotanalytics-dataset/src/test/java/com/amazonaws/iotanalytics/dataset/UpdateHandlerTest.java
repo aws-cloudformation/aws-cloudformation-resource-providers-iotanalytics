@@ -317,7 +317,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         verify(proxyClient.client(), times(1)).updateDataset(any(UpdateDatasetRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
         verify(proxyClient.client(), never()).tagResource(any(TagResourceRequest.class));
-        verify(proxyClient.client(), times(1)).describeDataset(any(DescribeDatasetRequest.class));
+        verify(proxyClient.client(), times(2)).describeDataset(any(DescribeDatasetRequest.class));
         verify(proxyClient.client(), times(1)).listTagsForResource(any(ListTagsForResourceRequest.class));
 
         assertThat(response).isNotNull();
@@ -370,6 +370,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .thenReturn(UpdateDatasetResponse.builder().build());
         when(proxyClient.client().untagResource(any(UntagResourceRequest.class)))
                 .thenThrow(LimitExceededException.builder().build());
+        when(proxyClient.client().describeDataset(any(DescribeDatasetRequest.class)))
+            .thenReturn(describeDatasetResponseSimple);
+
         // WHEN / THEN
         assertThrows(CfnServiceLimitExceededException.class,
                 () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
@@ -377,8 +380,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
         verify(proxyClient.client(), times(1))
                 .updateDataset(any(UpdateDatasetRequest.class));
         verify(proxyClient.client(), times(1)).untagResource(any(UntagResourceRequest.class));
+        verify(proxyClient.client(), times(1)).describeDataset(any(DescribeDatasetRequest.class));
         verify(proxyClient.client(), never()).tagResource(any(TagResourceRequest.class));
-        verify(proxyClient.client(), never()).describeDataset(any(DescribeDatasetRequest.class));
         verify(proxyClient.client(), never()).listTagsForResource(any(ListTagsForResourceRequest.class));
     }
 
@@ -394,6 +397,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .thenReturn(UpdateDatasetResponse.builder().build());
         when(proxyClient.client().untagResource(any(UntagResourceRequest.class))).thenReturn(UntagResourceResponse.builder().build());
         when(proxyClient.client().tagResource(any(TagResourceRequest.class))).thenThrow(ServiceUnavailableException.builder().build());
+        when(proxyClient.client().describeDataset(any(DescribeDatasetRequest.class)))
+            .thenReturn(describeDatasetResponseSimple);
 
         // WHEN / THEN
         assertThrows(CfnGeneralServiceException.class,
@@ -402,7 +407,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         verify(proxyClient.client(), times(1)).updateDataset(any(UpdateDatasetRequest.class));
         verify(proxyClient.client(), times(1)).untagResource(any(UntagResourceRequest.class));
         verify(proxyClient.client(), times(1)).tagResource(any(TagResourceRequest.class));
-        verify(proxyClient.client(), never()).describeDataset(any(DescribeDatasetRequest.class));
+        verify(proxyClient.client(), times(1)).describeDataset(any(DescribeDatasetRequest.class));
         verify(proxyClient.client(), never()).listTagsForResource(any(ListTagsForResourceRequest.class));
     }
 }
