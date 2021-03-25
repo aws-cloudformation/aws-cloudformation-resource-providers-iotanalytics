@@ -14,7 +14,7 @@
     {
       "ActionName": "sql_action",
       "QueryAction": {
-        "SqlQuery": "select * from cfn_datastore_1",
+        "SqlQuery": "select * from cfn_testing_datastore1",
         "Filters": [
           {
             "DeltaTime": {

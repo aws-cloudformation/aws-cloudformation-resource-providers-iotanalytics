@@ -13,7 +13,7 @@
   "PipelineActivities": [
     {
       "Channel": {
-        "ChannelName": "cfn_channel",
+        "ChannelName": "cfn_testing_channel",
         "Name": "channel_activity",
         "Next": "select_attr_activity"
       }
@@ -52,7 +52,7 @@
         "Name": "device_registry_enrich_activity",
         "ThingName": "a_thing_name",
         "Attribute": "device_registry",
-        "RoleArn": "arn:aws:iam::618235686450:role/IoT-Enrich-Role",
+        "RoleArn": "arn:aws:iam::282600434736:role/cfn-testing-role",
         "Next": "device_shadow_enrich_activity"
       }
     },
@@ -61,7 +61,7 @@
         "Name": "device_shadow_enrich_activity",
         "ThingName": "b_thing_name",
         "Attribute": "device_shadow",
-        "RoleArn": "arn:aws:iam::618235686450:role/IoT-Enrich-Role",
+        "RoleArn": "arn:aws:iam::282600434736:role/cfn-testing-role",
         "Next": "filter_activity"
       }
     },
@@ -90,7 +90,7 @@
     },
     {
       "Datastore": {
-        "DatastoreName": "cfn_datastore_1",
+        "DatastoreName": "cfn_testing_datastore1",
         "Name": "datastore_activity"
       }
     }

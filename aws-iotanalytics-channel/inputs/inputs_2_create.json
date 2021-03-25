@@ -2,8 +2,8 @@
   "ChannelName": "mychannel2",
   "ChannelStorage": {
     "CustomerManagedS3": {
-      "Bucket": "my-iot-analytics-bucket",
-      "RoleArn": "arn:aws:iam::618235686450:role/IoT-CMS-Role",
+      "Bucket": "cfn-testing-bucket",
+      "RoleArn": "arn:aws:iam::282600434736:role/cfn-testing-role",
       "KeyPrefix": "iota-prefix/"
     }
   }
