@@ -130,7 +130,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         final Map<String, String> tagsToCreate = getTagsToCreate(oldTagsMap, newTagsMap);
 
         String pipelineArn = getPipelineArn(
-            DescribePipelineRequest.builder().pipelineName(model.getPipelineName()).build(),
+            Translator.translateToDescribePipelineRequest(model),
             proxyClient);
 
         return progress

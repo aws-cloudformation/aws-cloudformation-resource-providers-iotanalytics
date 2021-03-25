@@ -127,7 +127,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         final Map<String, String> tagsToCreate = getTagsToCreate(oldTagsMap, newTagsMap);
 
         String datastoreArn = getDatastoreArn(
-            DescribeDatastoreRequest.builder().datastoreName(model.getDatastoreName()).build(),
+            Translator.translateToDescribeDatastoreRequest(model),
             proxyClient);
 
         return progress

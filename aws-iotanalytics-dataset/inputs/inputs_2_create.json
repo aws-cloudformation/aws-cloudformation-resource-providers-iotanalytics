@@ -16,7 +16,7 @@
       "Destination": {
         "S3DestinationConfiguration": {
           "Bucket": "cfn-testing-bucket",
-          "RoleArn": "arn:aws:iam::282600434736:role/cfn-testing-role",
+          "RoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
           "Key": "iota-dataset"
         }
       }
@@ -37,8 +37,8 @@
     {
       "ActionName": "container_action",
       "ContainerAction": {
-        "Image": "282600434736.dkr.ecr.us-east-1.amazonaws.com/cfn-testing-container",
-        "ExecutionRoleArn": "arn:aws:iam::282600434736:role/cfn-testing-role",
+        "Image": "<account_id>.dkr.ecr.us-east-1.amazonaws.com/cfn-testing-container",
+        "ExecutionRoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
         "ResourceConfiguration": {
           "VolumeSizeInGB": 1,
           "ComputeType": "ACU_2"

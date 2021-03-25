@@ -130,7 +130,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         final Map<String, String> tagsToCreate = getTagsToCreate(oldTagsMap, newTagsMap);
 
         String datasetArn = getDatasetArn(
-            DescribeDatasetRequest.builder().datasetName(model.getDatasetName()).build(),
+            Translator.translateToDescribeDatasetRequest(model),
             proxyClient);
 
         return progress

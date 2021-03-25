@@ -13,7 +13,7 @@
     "DatastoreStorage": {
         "CustomerManagedS3": {
             "Bucket": "cfn-testing-bucket",
-            "RoleArn": "arn:aws:iam::282600434736:role/cfn-testing-role",
+            "RoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
             "KeyPrefix": "iota-prefix/"
         }
     },

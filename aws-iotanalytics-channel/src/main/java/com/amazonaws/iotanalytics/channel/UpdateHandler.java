@@ -131,7 +131,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         final Map<String, String> tagsToCreate = getTagsToCreate(oldTagsMap, newTagsMap);
 
         String channelArn = getChannelArn(
-            DescribeChannelRequest.builder().channelName(model.getChannelName()).build(),
+            Translator.translateToDescribeChannelRequest(model),
             proxyClient);
 
         return progress
