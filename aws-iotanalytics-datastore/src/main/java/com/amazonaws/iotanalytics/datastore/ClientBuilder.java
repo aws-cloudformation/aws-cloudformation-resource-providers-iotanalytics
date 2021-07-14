@@ -18,10 +18,10 @@ class ClientBuilder {
 
         synchronized (ClientBuilder.class) {
             final Region region = Region.of(getEnvironmentValue("AWS_REGION", "us-west-2"));
-
             ioTAnalyticsClient = IoTAnalyticsClient.builder().region(region)
                     .overrideConfiguration(ClientOverrideConfiguration.builder()
                             .retryPolicy(RetryPolicy.builder().numRetries(3).build())
+                            .apiCallTimeout(Duration.ofSeconds(60L))
                             .build())
                     .build();
             return ioTAnalyticsClient;

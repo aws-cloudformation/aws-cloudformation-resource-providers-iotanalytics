@@ -21,6 +21,7 @@ class ClientBuilder {
             ioTAnalyticsClient = IoTAnalyticsClient.builder().region(region)
                     .overrideConfiguration(ClientOverrideConfiguration.builder()
                             .retryPolicy(RetryPolicy.builder().numRetries(3).build())
+                            .apiCallTimeout(Duration.ofSeconds(60L))
                             .build())
                     .build();
             return ioTAnalyticsClient;
