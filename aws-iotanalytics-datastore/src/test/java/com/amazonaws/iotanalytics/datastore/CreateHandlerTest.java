@@ -49,6 +49,9 @@ public class CreateHandlerTest extends AbstractTestBase {
     private static final String TEST_VALUE1 = "value1";
     private static final String TEST_KEY2 = "key2";
     private static final String TEST_VALUE2 = "value2";
+    private static final String TEST_ATTRIBUTE_PARTITION = "attribute";
+    private static final String TEST_TIMESTAMP_PARTITION_NAME = "timestampAttribute";
+    private static final String TEST_TIMESTAMP_PARTITION_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private CreateHandler handler;
 
@@ -90,6 +93,21 @@ public class CreateHandlerTest extends AbstractTestBase {
                         .build())
                 .tags(Arrays.asList(Tag.builder().key(TEST_KEY1).value(TEST_VALUE1).build(),
                         Tag.builder().key(TEST_KEY2).value(TEST_VALUE2).build()))
+                .datastorePartitions(DatastorePartitions
+                        .builder()
+                        .partitions(Arrays.asList(
+                                DatastorePartition.builder()
+                                        .partition(Partition.builder()
+                                                .attributeName(TEST_ATTRIBUTE_PARTITION)
+                                                .build())
+                                        .build(),
+                                DatastorePartition.builder()
+                                        .timestampPartition(TimestampPartition.builder()
+                                                .attributeName(TEST_TIMESTAMP_PARTITION_NAME)
+                                                .timestampFormat(TEST_TIMESTAMP_PARTITION_FORMAT)
+                                                .build())
+                                        .build()))
+                        .build())
                 .build();
 
         final CreateDatastoreResponse createDatastoreResponse = CreateDatastoreResponse.builder().build();
@@ -131,6 +149,21 @@ public class CreateHandlerTest extends AbstractTestBase {
                                                                 .build())
                                                 .build())
                                         .build())
+                                .build())
+                        .datastorePartitions(software.amazon.awssdk.services.iotanalytics.model.DatastorePartitions
+                                .builder()
+                                .partitions(
+                                        software.amazon.awssdk.services.iotanalytics.model.DatastorePartition.builder()
+                                                .attributePartition(software.amazon.awssdk.services.iotanalytics.model.Partition.builder()
+                                                        .attributeName(TEST_ATTRIBUTE_PARTITION)
+                                                        .build())
+                                                .build(),
+                                        software.amazon.awssdk.services.iotanalytics.model.DatastorePartition.builder()
+                                                .timestampPartition(software.amazon.awssdk.services.iotanalytics.model.TimestampPartition.builder()
+                                                        .attributeName(TEST_TIMESTAMP_PARTITION_NAME)
+                                                        .timestampFormat(TEST_TIMESTAMP_PARTITION_FORMAT)
+                                                        .build())
+                                                .build())
                                 .build())
                         .build())
                 .build();
@@ -188,6 +221,13 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(createDatastoreRequest.tags().get(0).value()).isEqualTo(TEST_VALUE1);
         assertThat(createDatastoreRequest.tags().get(1).key()).isEqualTo(TEST_KEY2);
         assertThat(createDatastoreRequest.tags().get(1).value()).isEqualTo(TEST_VALUE2);
+        assertThat(createDatastoreRequest.datastorePartitions().partitions().size()).isEqualTo(2);
+        assertThat(createDatastoreRequest.datastorePartitions().partitions().get(0).attributePartition()
+                .attributeName()).isEqualTo(TEST_ATTRIBUTE_PARTITION);
+        assertThat(createDatastoreRequest.datastorePartitions().partitions().get(1).timestampPartition()
+                .attributeName()).isEqualTo(TEST_TIMESTAMP_PARTITION_NAME);
+        assertThat(createDatastoreRequest.datastorePartitions().partitions().get(1).timestampPartition()
+                .timestampFormat()).isEqualTo(TEST_TIMESTAMP_PARTITION_FORMAT);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

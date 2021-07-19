@@ -9,7 +9,8 @@ In order to perform contract tests with `cfn-test`, you will need to:
     * IAM Role: `cfn-testing-role` (with permissions for all the resources below, ideally full permissions for `iotanalytics` and read permissions for others)
     * IoTAnalytics Channel: `cfn_testing_channel`
     * IoTAnalytics Datastore: `cfn_testing_datastore1`, `cfn_testing_datastore2`
-    * S3 Bucket: `cfn-testing-bucket`
+    * S3 Bucket: `cfn-testing-bucket` (note that this name might not be available since S3 bucket names must be unique globally, so replace with alternative
+      like `cfn-testing-bucket-<your_alias>`)
     * ECR Container: `cfn-testing-container`
     
 In order to register your resources with `cfn submit`, you will need to:
