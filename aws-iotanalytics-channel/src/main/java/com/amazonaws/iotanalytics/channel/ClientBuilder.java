@@ -6,6 +6,8 @@ import software.amazon.awssdk.core.retry.RetryPolicy;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
 
+import java.time.Duration;
+
 class ClientBuilder {
     private static volatile IoTAnalyticsClient ioTAnalyticsClient;
 
