@@ -204,7 +204,8 @@
             "additionalProperties": false,
             "properties": {
                 "AttributeName": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "[a-zA-Z0-9_]+"
                 }
             },
             "required": [
@@ -216,10 +217,12 @@
             "additionalProperties": false,
             "properties": {
                 "AttributeName": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "[a-zA-Z0-9_]+"
                 },
                 "TimestampFormat": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "[a-zA-Z0-9\\s\\[\\]_,.'/:-]*"
                 }
             },
             "required": [
