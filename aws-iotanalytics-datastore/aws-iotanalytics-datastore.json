@@ -13,6 +13,9 @@
             "minLength": 1,
             "maxLength": 128
         },
+        "DatastorePartitions": {
+            "$ref": "#/definitions/DatastorePartitions"
+        },
         "Id": {
             "type": "string"
         },
@@ -54,6 +57,8 @@
                     "type": "array",
                     "uniqueItems": false,
                     "insertionOrder": false,
+                    "minItems": 1,
+                    "maxItems": 100,
                     "items": {
                         "$ref": "#/definitions/Column"
                     }
@@ -165,6 +170,64 @@
                     "type": "boolean"
                 }
             }
+        },
+        "DatastorePartitions": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Partitions": {
+                    "type": "array",
+                    "uniqueItems": false,
+                    "insertionOrder": false,
+                    "minItems": 0,
+                    "maxItems": 25,
+                    "items": {
+                        "$ref": "#/definitions/DatastorePartition"
+                    }
+                }
+            }
+        },
+        "DatastorePartition": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Partition": {
+                    "$ref": "#/definitions/Partition"
+                },
+                "TimestampPartition": {
+                    "$ref": "#/definitions/TimestampPartition"
+                }
+            }
+        },
+        "Partition": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "AttributeName": {
+                    "type": "string",
+                    "pattern": "[a-zA-Z0-9_]+"
+                }
+            },
+            "required": [
+                "AttributeName"
+            ]
+        },
+        "TimestampPartition": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "AttributeName": {
+                    "type": "string",
+                    "pattern": "[a-zA-Z0-9_]+"
+                },
+                "TimestampFormat": {
+                    "type": "string",
+                    "pattern": "[a-zA-Z0-9\\s\\[\\]_,.'/:-]*"
+                }
+            },
+            "required": [
+                "AttributeName"
+            ]
         }
     },
     "createOnlyProperties": [

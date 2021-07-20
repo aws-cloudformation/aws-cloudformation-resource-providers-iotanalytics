@@ -32,5 +32,25 @@
                 ]
             }
         }
+    },
+    "DatastorePartitions": {
+        "Partitions": [
+            {
+                "Partition": {
+                    "AttributeName": "attributeFoo"
+                }
+            },
+            {
+                "TimestampPartition": {
+                    "AttributeName": "timeAttribute",
+                    "TimestampFormat": "yyyy-MM-dd HH:mm:ss"
+                }
+            },
+            {
+                "Partition": {
+                    "AttributeName": "attributeBar"
+                }
+            }
+        ]
     }
 }

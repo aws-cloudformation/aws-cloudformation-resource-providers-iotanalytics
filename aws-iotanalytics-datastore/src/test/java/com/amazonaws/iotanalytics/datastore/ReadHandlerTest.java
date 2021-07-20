@@ -46,6 +46,9 @@ public class ReadHandlerTest extends AbstractTestBase {
     private static final String TEST_VALUE1 = "value1";
     private static final String TEST_KEY2 = "key2";
     private static final String TEST_VALUE2 = "value2";
+    private static final String TEST_ATTRIBUTE_PARTITION = "attribute";
+    private static final String TEST_TIMESTAMP_PARTITION_NAME = "timestampAttribute";
+    private static final String TEST_TIMESTAMP_PARTITION_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @Captor
     private ArgumentCaptor<DescribeDatastoreRequest> describeDatastoreRequestArgumentCaptor;
@@ -93,6 +96,21 @@ public class ReadHandlerTest extends AbstractTestBase {
                                                                 software.amazon.awssdk.services.iotanalytics.model.Column.builder().name(TEST_COL_NAME2).type(TEST_COL_TYPE2).build()))
                                                         .build())
                                                 .build())
+                                        .build())
+                                .datastorePartitions(software.amazon.awssdk.services.iotanalytics.model.DatastorePartitions
+                                        .builder()
+                                        .partitions(Arrays.asList(
+                                                software.amazon.awssdk.services.iotanalytics.model.DatastorePartition.builder()
+                                                        .attributePartition(software.amazon.awssdk.services.iotanalytics.model.Partition.builder()
+                                                                .attributeName(TEST_ATTRIBUTE_PARTITION)
+                                                                .build())
+                                                        .build(),
+                                                software.amazon.awssdk.services.iotanalytics.model.DatastorePartition.builder()
+                                                        .timestampPartition(software.amazon.awssdk.services.iotanalytics.model.TimestampPartition.builder()
+                                                                .attributeName(TEST_TIMESTAMP_PARTITION_NAME)
+                                                                .timestampFormat(TEST_TIMESTAMP_PARTITION_FORMAT)
+                                                                .build())
+                                                        .build()))
                                         .build())
                                 .name(TEST_DATASTORE_NAME)
                                 .build())
@@ -159,6 +177,14 @@ public class ReadHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getTags().get(0).getValue()).isEqualTo(TEST_VALUE1);
         assertThat(response.getResourceModel().getTags().get(1).getKey()).isEqualTo(TEST_KEY2);
         assertThat(response.getResourceModel().getTags().get(1).getValue()).isEqualTo(TEST_VALUE2);
+
+        assertThat(response.getResourceModel().getDatastorePartitions().getPartitions().size()).isEqualTo(2);
+        assertThat(response.getResourceModel().getDatastorePartitions().getPartitions().get(0).getPartition()
+                .getAttributeName()).isEqualTo(TEST_ATTRIBUTE_PARTITION);
+        assertThat(response.getResourceModel().getDatastorePartitions().getPartitions().get(1).getTimestampPartition()
+                .getAttributeName()).isEqualTo(TEST_TIMESTAMP_PARTITION_NAME);
+        assertThat(response.getResourceModel().getDatastorePartitions().getPartitions().get(1).getTimestampPartition()
+                .getTimestampFormat()).isEqualTo(TEST_TIMESTAMP_PARTITION_FORMAT);
     }
 
     @Test

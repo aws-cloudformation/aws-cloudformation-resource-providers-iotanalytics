@@ -4,6 +4,8 @@ import com.amazonaws.util.StringUtils;
 import com.google.common.annotations.VisibleForTesting;
 import software.amazon.awssdk.services.iotanalytics.model.Column;
 import software.amazon.awssdk.services.iotanalytics.model.Datastore;
+import software.amazon.awssdk.services.iotanalytics.model.DatastorePartition;
+import software.amazon.awssdk.services.iotanalytics.model.DatastorePartitions;
 import software.amazon.awssdk.services.iotanalytics.model.DatastoreStorage;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CustomerManagedDatastoreS3Storage;
@@ -17,6 +19,7 @@ import software.amazon.awssdk.services.iotanalytics.model.JsonConfiguration;
 import software.amazon.awssdk.services.iotanalytics.model.LimitExceededException;
 import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.iotanalytics.model.ParquetConfiguration;
+import software.amazon.awssdk.services.iotanalytics.model.Partition;
 import software.amazon.awssdk.services.iotanalytics.model.ResourceAlreadyExistsException;
 import software.amazon.awssdk.services.iotanalytics.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.iotanalytics.model.RetentionPeriod;
@@ -25,6 +28,7 @@ import software.amazon.awssdk.services.iotanalytics.model.SchemaDefinition;
 import software.amazon.awssdk.services.iotanalytics.model.ServiceUnavailableException;
 import software.amazon.awssdk.services.iotanalytics.model.Tag;
 import software.amazon.awssdk.services.iotanalytics.model.ThrottlingException;
+import software.amazon.awssdk.services.iotanalytics.model.TimestampPartition;
 import software.amazon.awssdk.services.iotanalytics.model.UpdateDatastoreRequest;
 import software.amazon.cloudformation.exceptions.BaseHandlerException;
 import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
@@ -54,6 +58,7 @@ class Translator {
                 .datastoreStorage(translateDatastoreStorageToCfn(datastore.storage()))
                 .fileFormatConfiguration(translateFileFormatConfigurationToCfn(datastore.fileFormatConfiguration()))
                 .tags(translateTagsToCfn(tagList))
+                .datastorePartitions(translateDatastorePartitionsToCfn(datastore.datastorePartitions()))
                 .build();
     }
     static UpdateDatastoreRequest translateToUpdateDatastoreRequest(final ResourceModel model) {
@@ -81,6 +86,7 @@ class Translator {
                 .retentionPeriod(translateRetentionPeriodFromCfn(model.getRetentionPeriod()))
                 .fileFormatConfiguration(translateFileFormatConfigurationFromCfn(model.getFileFormatConfiguration()))
                 .tags(translateTagListsFromCfn(model.getTags()))
+                .datastorePartitions(translateDatastorePartitionsFromCfn(model.getDatastorePartitions()))
                 .build();
     }
 
@@ -210,6 +216,64 @@ class Translator {
         }
         if (cfnFileFormatConfiguration.getJsonConfiguration() != null) {
             builder.jsonConfiguration(JsonConfiguration.builder().build());
+        }
+        return builder.build();
+    }
+
+    private static com.amazonaws.iotanalytics.datastore.DatastorePartitions translateDatastorePartitionsToCfn(
+            @Nullable final DatastorePartitions datastorePartitions
+    ) {
+        if (datastorePartitions == null) {
+            return null;
+        }
+        final com.amazonaws.iotanalytics.datastore.DatastorePartitions.DatastorePartitionsBuilder builder =
+                com.amazonaws.iotanalytics.datastore.DatastorePartitions.builder();
+        if (datastorePartitions.partitions() != null) {
+            builder.partitions(datastorePartitions.partitions().stream().map(par -> {
+                final com.amazonaws.iotanalytics.datastore.DatastorePartition.DatastorePartitionBuilder dpBuilder =
+                        com.amazonaws.iotanalytics.datastore.DatastorePartition.builder();
+                if (par.attributePartition() != null) {
+                    dpBuilder.partition(com.amazonaws.iotanalytics.datastore.Partition.builder()
+                            .attributeName(par.attributePartition().attributeName())
+                            .build());
+                }
+                if (par.timestampPartition() != null) {
+                    dpBuilder.timestampPartition(com.amazonaws.iotanalytics.datastore.TimestampPartition.builder()
+                            .attributeName(par.timestampPartition().attributeName())
+                            .timestampFormat(par.timestampPartition().timestampFormat())
+                            .build());
+                }
+                return dpBuilder.build();
+            })
+                    .collect(Collectors.toList()));
+        }
+        return builder.build();
+    }
+
+    private static DatastorePartitions translateDatastorePartitionsFromCfn(
+            @Nullable final com.amazonaws.iotanalytics.datastore.DatastorePartitions cfnDatastorePartitions
+    ) {
+        if (cfnDatastorePartitions == null) {
+            return null;
+        }
+        final DatastorePartitions.Builder builder = DatastorePartitions.builder();
+        if (cfnDatastorePartitions.getPartitions() != null) {
+            builder.partitions(cfnDatastorePartitions.getPartitions().stream().map(par -> {
+                final DatastorePartition.Builder dpBuilder = DatastorePartition.builder();
+                if (par.getPartition() != null) {
+                    dpBuilder.attributePartition(Partition.builder()
+                            .attributeName(par.getPartition().getAttributeName())
+                            .build());
+                }
+                if (par.getTimestampPartition() != null) {
+                    dpBuilder.timestampPartition(TimestampPartition.builder()
+                            .attributeName(par.getTimestampPartition().getAttributeName())
+                            .timestampFormat(par.getTimestampPartition().getTimestampFormat())
+                            .build());
+                }
+                return dpBuilder.build();
+            })
+                    .collect(Collectors.toList()));
         }
         return builder.build();
     }
