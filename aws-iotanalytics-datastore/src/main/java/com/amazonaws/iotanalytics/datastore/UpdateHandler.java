@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -88,6 +89,11 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         } else if (!StringUtils.isEmpty(newModel.getId())
                 && !StringUtils.equals(newModel.getId(), prevModel.getId())) {
             throwCfnNotUpdatableException("Id");
+        } else if (newModel.getDatastorePartitions() != null) {
+            if (newModel.getDatastorePartitions().getPartitions().size() != prevModel.getDatastorePartitions().getPartitions().size() ||
+                    !Objects.equals(newModel.getDatastorePartitions(), prevModel.getDatastorePartitions())) {
+                throwCfnNotUpdatableException("DatastorePartitions");
+            }
         }
     }
 
