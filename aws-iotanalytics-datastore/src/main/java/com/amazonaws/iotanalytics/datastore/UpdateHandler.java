@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.iotanalytics.model.UpdateDatastoreRequest
 import software.amazon.awssdk.services.iotanalytics.model.UpdateDatastoreResponse;
 import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -25,6 +26,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,6 +52,16 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
 
         final ResourceModel prevModel = request.getPreviousResourceState();
         final ResourceModel newModel = request.getDesiredResourceState();
+
+        if ((newModel.getDatastorePartitions() == null && prevModel.getDatastorePartitions() != null) ||
+                (newModel.getDatastorePartitions() != null && prevModel.getDatastorePartitions() == null)) {
+            return failedProgressEvent("DatastorePartitions", null, callbackContext, HandlerErrorCode.InvalidRequest);
+        } else if (newModel.getDatastorePartitions() != null && prevModel.getDatastorePartitions() != null) {
+            if (newModel.getDatastorePartitions().getPartitions().size() != prevModel.getDatastorePartitions().getPartitions().size() ||
+                    !Objects.equals(newModel.getDatastorePartitions(), prevModel.getDatastorePartitions())) {
+                return failedProgressEvent("DatastorePartitions", null, callbackContext, HandlerErrorCode.InvalidRequest);
+            }
+        }
 
         validatePropertiesAreUpdatable(newModel, prevModel);
 
@@ -82,6 +94,7 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         }
     }
 
+    // TODO: refactor DatastoreName and Id properties to return ProgressEvent.failed
     private void validatePropertiesAreUpdatable(final ResourceModel newModel, final ResourceModel prevModel) {
         if (!StringUtils.equals(newModel.getDatastoreName(), prevModel.getDatastoreName())) {
             throwCfnNotUpdatableException("DatastoreName");
@@ -96,6 +109,15 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         throw new CfnNotUpdatableException(InvalidParameterValueException.builder()
                 .message(String.format("Parameter '%s' is not updatable.", propertyName))
                 .build());
+    }
+
+    private ProgressEvent<ResourceModel, CallbackContext> failedProgressEvent(final String propertyName,
+                                                                              final ResourceModel model,
+                                                                              final CallbackContext callbackContext,
+                                                                              final HandlerErrorCode errorCode) {
+        logger.log(String.format("ERROR %s [%s] is not updatable", ResourceModel.TYPE_NAME, propertyName));
+        return ProgressEvent.failed(model, callbackContext, errorCode,
+                String.format("%s is a create-only property and cannot be updated.", propertyName));
     }
 
     private String getDatastoreArn(final DescribeDatastoreRequest request,
