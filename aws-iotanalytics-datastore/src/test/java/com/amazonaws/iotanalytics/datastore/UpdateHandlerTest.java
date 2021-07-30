@@ -28,6 +28,7 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
@@ -250,6 +251,121 @@ public class UpdateHandlerTest extends AbstractTestBase {
         // WHEN / THEN
         assertThrows(CfnNotUpdatableException.class,
                 () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+
+        verify(proxyClient.client(), never()).updateDatastore(any(UpdateDatastoreRequest.class));
+        verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
+        verify(proxyClient.client(), never()).tagResource(any(TagResourceRequest.class));
+        verify(proxyClient.client(), never()).describeDatastore(any(DescribeDatastoreRequest.class));
+        verify(proxyClient.client(), never()).listTagsForResource(any(ListTagsForResourceRequest.class));
+    }
+
+    @Test
+    public void GIVEN_update_partitions_same_array_size_different_items_WHEN_call_handleRequest_THEN_return_failed_invalid_request() {
+        // GIVEN
+        final ResourceModel preModel = ResourceModel.builder().datastoreName("name1")
+                .datastorePartitions(DatastorePartitions
+                        .builder()
+                        .partitions(Arrays.asList(
+                                DatastorePartition.builder()
+                                        .partition(Partition.builder()
+                                                .attributeName("Attribute1")
+                                                .build())
+                                        .build(),
+                                DatastorePartition.builder()
+                                        .timestampPartition(TimestampPartition.builder()
+                                                .attributeName("timeAttribute")
+                                                .timestampFormat("yyyy-MM-dd HH:mm:ss")
+                                                .build())
+                                        .build()))
+                        .build()).build();
+        final ResourceModel newModel = ResourceModel.builder().datastoreName("name1")
+                .datastorePartitions(DatastorePartitions
+                        .builder()
+                        .partitions(Arrays.asList(
+                                DatastorePartition.builder()
+                                        .partition(Partition.builder()
+                                                .attributeName("DifferentAttribute")
+                                                .build())
+                                        .build(),
+                                DatastorePartition.builder()
+                                        .timestampPartition(TimestampPartition.builder()
+                                                .attributeName("timeAttribute")
+                                                .timestampFormat("yyyy-MM-dd HH:mm:ss")
+                                                .build())
+                                        .build()))
+                        .build()).build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(newModel)
+                .previousResourceState(preModel)
+                .build();
+
+        // WHEN
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNotNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNotNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
+
+        verify(proxyClient.client(), never()).updateDatastore(any(UpdateDatastoreRequest.class));
+        verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
+        verify(proxyClient.client(), never()).tagResource(any(TagResourceRequest.class));
+        verify(proxyClient.client(), never()).describeDatastore(any(DescribeDatastoreRequest.class));
+        verify(proxyClient.client(), never()).listTagsForResource(any(ListTagsForResourceRequest.class));
+    }
+
+    @Test
+    public void GIVEN_update_partitions_different_array_size_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
+        // GIVEN
+        final ResourceModel preModel = ResourceModel.builder().datastoreName("name1")
+                .datastorePartitions(DatastorePartitions
+                        .builder()
+                        .partitions(Arrays.asList(
+                                DatastorePartition.builder()
+                                        .partition(Partition.builder()
+                                                .attributeName("myAttribute")
+                                                .build())
+                                        .build(),
+                                DatastorePartition.builder()
+                                        .partition(Partition.builder()
+                                                .attributeName("myAttribute2")
+                                                .build())
+                                        .build()))
+                        .build()).build();
+        final ResourceModel newModel = ResourceModel.builder().datastoreName("name1")
+                .datastorePartitions(DatastorePartitions
+                        .builder()
+                        .partitions(Arrays.asList(
+                                DatastorePartition.builder()
+                                        .partition(Partition.builder()
+                                                .attributeName("myAttribute")
+                                                .build())
+                                        .build()))
+                        .build()).build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(newModel)
+                .previousResourceState(preModel)
+                .build();
+
+        // WHEN
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNotNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNotNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
 
         verify(proxyClient.client(), never()).updateDatastore(any(UpdateDatastoreRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
