@@ -101,11 +101,6 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         } else if (!StringUtils.isEmpty(newModel.getId())
                 && !StringUtils.equals(newModel.getId(), prevModel.getId())) {
             throwCfnNotUpdatableException("Id");
-        } else if (newModel.getDatastorePartitions() != null) {
-            if (newModel.getDatastorePartitions().getPartitions().size() != prevModel.getDatastorePartitions().getPartitions().size() ||
-                    !Objects.equals(newModel.getDatastorePartitions(), prevModel.getDatastorePartitions())) {
-                throwCfnNotUpdatableException("DatastorePartitions");
-            }
         }
     }
 
