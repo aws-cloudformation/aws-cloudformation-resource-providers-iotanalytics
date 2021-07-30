@@ -231,8 +231,7 @@
         }
     },
     "createOnlyProperties": [
-        "/properties/DatastoreName",
-        "/properties/DatastorePartitions"
+        "/properties/DatastoreName"
     ],
     "primaryIdentifier": [
         "/properties/DatastoreName"
