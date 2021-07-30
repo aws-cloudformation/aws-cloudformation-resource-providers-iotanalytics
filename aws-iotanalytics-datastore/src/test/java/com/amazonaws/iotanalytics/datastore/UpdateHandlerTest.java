@@ -95,6 +95,15 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .retentionPeriod(RetentionPeriod.builder().numberOfDays(TEST_DAYS).build())
                 .tags(Arrays.asList(Tag.builder().key(TEST_KEY1).value(TEST_VALUE1).build(),
                         Tag.builder().key(TEST_KEY2).value(TEST_VALUE2).build()))
+                .datastorePartitions(DatastorePartitions
+                        .builder()
+                        .partitions(Arrays.asList(
+                                DatastorePartition.builder()
+                                        .partition(Partition.builder()
+                                                .attributeName("myAttribute")
+                                                .build())
+                                        .build()))
+                        .build())
                 .build();
 
         newModel = ResourceModel.builder()
