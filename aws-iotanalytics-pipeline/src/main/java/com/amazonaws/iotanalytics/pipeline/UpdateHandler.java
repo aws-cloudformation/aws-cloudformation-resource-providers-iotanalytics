@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.iotanalytics.model.UpdatePipelineRequest;
 import software.amazon.awssdk.services.iotanalytics.model.UpdatePipelineResponse;
 import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -53,6 +54,11 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
 
         final ResourceModel prevModel = request.getPreviousResourceState();
         final ResourceModel newModel = request.getDesiredResourceState();
+
+        if (!StringUtils.isEmpty(newModel.getId())
+                && !StringUtils.equals(newModel.getId(), prevModel.getId())) {
+            return updateFailedProgressEvent("Id", null, callbackContext, HandlerErrorCode.InvalidRequest);
+        }
 
         validatePropertiesAreUpdatable(newModel, prevModel);
 
@@ -99,6 +105,15 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         throw new CfnNotUpdatableException(InvalidParameterValueException.builder()
                 .message(String.format("Parameter '%s' is not updatable.", propertyName))
                 .build());
+    }
+
+    private ProgressEvent<ResourceModel, CallbackContext> updateFailedProgressEvent(final String propertyName,
+                                                                                    final ResourceModel model,
+                                                                                    final CallbackContext callbackContext,
+                                                                                    final HandlerErrorCode errorCode) {
+        logger.log(String.format("ERROR %s [%s] is not updatable", ResourceModel.TYPE_NAME, propertyName));
+        return ProgressEvent.failed(model, callbackContext, errorCode,
+                String.format("%s cannot be updated", propertyName));
     }
 
     private String getPipelineArn(final DescribePipelineRequest request,

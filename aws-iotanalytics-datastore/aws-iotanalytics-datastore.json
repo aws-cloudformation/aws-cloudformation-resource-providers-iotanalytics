@@ -230,9 +230,6 @@
             ]
         }
     },
-    "createOnlyProperties": [
-        "/properties/DatastoreName"
-    ],
     "primaryIdentifier": [
         "/properties/DatastoreName"
     ],
