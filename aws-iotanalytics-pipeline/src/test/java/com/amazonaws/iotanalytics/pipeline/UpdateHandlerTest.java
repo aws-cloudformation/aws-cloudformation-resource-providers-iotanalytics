@@ -272,7 +272,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void GIVEN_update_diff_pipeline_name_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
+    public void GIVEN_update_diff_pipeline_name_WHEN_call_handleRequest_THEN_return_failed_invalid_request() {
         // GIVEN
         final ResourceModel preModel = ResourceModel.builder().pipelineName("name1").build();
         final ResourceModel newModel = ResourceModel.builder().pipelineName("name2").build();
@@ -282,9 +282,18 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .previousResourceState(preModel)
                 .build();
 
-        // WHEN / THEN
-        assertThrows(CfnNotUpdatableException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        // WHEN
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNotNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNotNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
 
         verify(proxyClient.client(), never()).updatePipeline(any(UpdatePipelineRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
