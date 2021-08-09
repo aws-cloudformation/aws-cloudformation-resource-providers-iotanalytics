@@ -19,8 +19,8 @@ import software.amazon.awssdk.services.iotanalytics.model.UpdateChannelRequest;
 import software.amazon.awssdk.services.iotanalytics.model.UpdateChannelResponse;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
-import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
@@ -203,7 +203,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void GIVEN_update_diff_channel_name_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
+    public void GIVEN_update_diff_channel_name_WHEN_call_handleRequest_THEN_return_failed_invalid_request() {
         // GIVEN
         final ResourceModel preModel = ResourceModel.builder().channelName("name1").build();
         final ResourceModel newModel = ResourceModel.builder().channelName("name2").build();
@@ -213,9 +213,18 @@ public class UpdateHandlerTest extends AbstractTestBase {
             .previousResourceState(preModel)
             .build();
 
-        // WHEN / THEN
-        assertThrows(CfnNotUpdatableException.class,
-            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        // WHEN
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNotNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNotNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
 
         verify(proxyClient.client(), never()).updateChannel(any(UpdateChannelRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
@@ -225,7 +234,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void GIVEN_update_channel_arn_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
+    public void GIVEN_update_channel_arn_WHEN_call_handleRequest_THEN_return_failed_invalid_request() {
         // GIVEN
         final ResourceModel preModel = ResourceModel.builder().channelName("name1").id("id1").build();
         final ResourceModel newModel = ResourceModel.builder().channelName("name1").id("id2").build();
@@ -235,9 +244,18 @@ public class UpdateHandlerTest extends AbstractTestBase {
             .previousResourceState(preModel)
             .build();
 
-        // WHEN / THEN
-        assertThrows(CfnNotUpdatableException.class,
-            () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        // WHEN
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNotNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNotNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
 
         verify(proxyClient.client(), never()).updateChannel(any(UpdateChannelRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));

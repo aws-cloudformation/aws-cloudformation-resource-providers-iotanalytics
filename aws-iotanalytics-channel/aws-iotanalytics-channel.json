@@ -112,9 +112,6 @@
             }
         }
     },
-    "createOnlyProperties": [
-        "/properties/ChannelName"
-    ],
     "primaryIdentifier": [
         "/properties/ChannelName"
     ],

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import software.amazon.awssdk.services.iotanalytics.model.Datastore;
 import software.amazon.awssdk.services.iotanalytics.model.DescribeDatastoreRequest;
 import software.amazon.awssdk.services.iotanalytics.model.DescribeDatastoreResponse;
@@ -21,12 +20,10 @@ import software.amazon.awssdk.services.iotanalytics.model.TagResourceRequest;
 import software.amazon.awssdk.services.iotanalytics.model.TagResourceResponse;
 import software.amazon.awssdk.services.iotanalytics.model.UntagResourceRequest;
 import software.amazon.awssdk.services.iotanalytics.model.UntagResourceResponse;
-
 import software.amazon.awssdk.services.iotanalytics.model.UpdateDatastoreRequest;
 import software.amazon.awssdk.services.iotanalytics.model.UpdateDatastoreResponse;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
-import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -216,7 +213,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void GIVEN_update_diff_datastore_name_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
+    public void GIVEN_update_diff_datastore_name_WHEN_call_handleRequest_THEN_return_failed_invalid_request() {
         // GIVEN
         final ResourceModel preModel = ResourceModel.builder().datastoreName("name1").build();
         final ResourceModel newModel = ResourceModel.builder().datastoreName("name2").build();
@@ -226,9 +223,18 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .previousResourceState(preModel)
                 .build();
 
-        // WHEN / THEN
-        assertThrows(CfnNotUpdatableException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        // WHEN
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNotNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNotNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
 
         verify(proxyClient.client(), never()).updateDatastore(any(UpdateDatastoreRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));
@@ -238,7 +244,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     @Test
-    public void GIVEN_update_datastore_arn_WHEN_call_handleRequest_THEN_throw_CfnNotUpdatableException() {
+    public void GIVEN_update_datastore_arn_WHEN_call_handleRequest_THEN_return_failed_invalid_request() {
         // GIVEN
         final ResourceModel preModel = ResourceModel.builder().datastoreName("name1").id("id1").build();
         final ResourceModel newModel = ResourceModel.builder().datastoreName("name1").id("id2").build();
@@ -248,9 +254,18 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .previousResourceState(preModel)
                 .build();
 
-        // WHEN / THEN
-        assertThrows(CfnNotUpdatableException.class,
-                () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
+        // WHEN
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
+        assertThat(response.getCallbackContext()).isNotNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNotNull();
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.InvalidRequest);
 
         verify(proxyClient.client(), never()).updateDatastore(any(UpdateDatastoreRequest.class));
         verify(proxyClient.client(), never()).untagResource(any(UntagResourceRequest.class));

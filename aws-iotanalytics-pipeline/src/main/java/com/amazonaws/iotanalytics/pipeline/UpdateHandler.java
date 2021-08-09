@@ -2,7 +2,6 @@ package com.amazonaws.iotanalytics.pipeline;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import software.amazon.awssdk.services.cloudwatch.model.InvalidParameterValueException;
 import software.amazon.awssdk.services.iotanalytics.IoTAnalyticsClient;
 import software.amazon.awssdk.services.iotanalytics.model.DescribePipelineRequest;
 import software.amazon.awssdk.services.iotanalytics.model.DescribePipelineResponse;
@@ -13,8 +12,8 @@ import software.amazon.awssdk.services.iotanalytics.model.UntagResourceRequest;
 import software.amazon.awssdk.services.iotanalytics.model.UntagResourceResponse;
 import software.amazon.awssdk.services.iotanalytics.model.UpdatePipelineRequest;
 import software.amazon.awssdk.services.iotanalytics.model.UpdatePipelineResponse;
-import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -54,7 +53,12 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         final ResourceModel prevModel = request.getPreviousResourceState();
         final ResourceModel newModel = request.getDesiredResourceState();
 
-        validatePropertiesAreUpdatable(newModel, prevModel);
+        if (!StringUtils.equals(newModel.getPipelineName(), prevModel.getPipelineName())) {
+            return updateFailedProgressEvent("PipelineName", null, callbackContext, HandlerErrorCode.InvalidRequest);
+        } else if (!StringUtils.isEmpty(newModel.getId())
+                && !StringUtils.equals(newModel.getId(), prevModel.getId())) {
+            return updateFailedProgressEvent("Id", null, callbackContext, HandlerErrorCode.InvalidRequest);
+        }
 
         return ProgressEvent.progress(newModel, callbackContext)
                 .then(progress ->
@@ -85,20 +89,13 @@ public class UpdateHandler extends BaseIoTAnalyticsHandler {
         }
     }
 
-    private void validatePropertiesAreUpdatable(final ResourceModel newModel, final ResourceModel prevModel) {
-        if (!StringUtils.equals(newModel.getPipelineName(), prevModel.getPipelineName())) {
-            throwCfnNotUpdatableException("PipelineName");
-        } else if (!StringUtils.isEmpty(newModel.getId())
-                && !StringUtils.equals(newModel.getId(), prevModel.getId())) {
-            throwCfnNotUpdatableException("Id");
-        }
-    }
-
-    private void throwCfnNotUpdatableException(String propertyName) {
+    private ProgressEvent<ResourceModel, CallbackContext> updateFailedProgressEvent(final String propertyName,
+                                                                                    final ResourceModel model,
+                                                                                    final CallbackContext callbackContext,
+                                                                                    final HandlerErrorCode errorCode) {
         logger.log(String.format("ERROR %s [%s] is not updatable", ResourceModel.TYPE_NAME, propertyName));
-        throw new CfnNotUpdatableException(InvalidParameterValueException.builder()
-                .message(String.format("Parameter '%s' is not updatable.", propertyName))
-                .build());
+        return ProgressEvent.failed(model, callbackContext, errorCode,
+                String.format("%s cannot be updated", propertyName));
     }
 
     private String getPipelineArn(final DescribePipelineRequest request,

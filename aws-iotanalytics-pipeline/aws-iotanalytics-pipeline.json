@@ -380,7 +380,6 @@
         }
     },
     "required" : [ "PipelineName", "PipelineActivities" ],
-    "createOnlyProperties" : [ "/properties/PipelineName" ],
     "primaryIdentifier" : [ "/properties/PipelineName" ],
     "readOnlyProperties" : [ "/properties/Id" ],
     "handlers": {
