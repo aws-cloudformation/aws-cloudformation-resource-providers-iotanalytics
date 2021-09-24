@@ -37,7 +37,7 @@
         "Name": "device_registry_enrich_activity",
         "ThingName": "a_thing_name",
         "Attribute": "device_registry",
-        "RoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
+        "RoleArn": "arn:aws:iam::820552022303:role/cfn-testing-role",
         "Next": "filter_activity"
       }
     },

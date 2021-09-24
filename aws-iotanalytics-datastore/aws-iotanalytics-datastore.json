@@ -46,6 +46,9 @@
                 },
                 "CustomerManagedS3": {
                     "$ref": "#/definitions/CustomerManagedS3"
+                },
+                "IotSiteWiseMultiLayerStorage": {
+                    "$ref": "#/definitions/IotSiteWiseMultiLayerStorage"
                 }
             }
         },
@@ -131,6 +134,36 @@
             "required": [
                 "Bucket",
                 "RoleArn"
+            ]
+        },
+        "IotSiteWiseMultiLayerStorage": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "CustomerManagedS3Storage": {
+                    "$ref": "#/definitions/CustomerManagedS3Storage"
+                }
+            }
+        },
+        "CustomerManagedS3Storage": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Bucket": {
+                    "type": "string",
+                    "pattern": "[a-zA-Z0-9.\\-_]*",
+                    "minLength": 3,
+                    "maxLength": 255
+                },
+                "KeyPrefix": {
+                    "type": "string",
+                    "pattern": "[a-zA-Z0-9!_.*'()/{}:-]*/",
+                    "minLength": 1,
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "Bucket"
             ]
         },
         "ServiceManagedS3": {
@@ -239,7 +272,8 @@
     "handlers": {
         "create": {
             "permissions": [
-                "iotanalytics:CreateDatastore"
+                "iotanalytics:CreateDatastore",
+                "iam:Passrole"
             ]
         },
         "read": {
@@ -253,7 +287,8 @@
             "permissions": [
                 "iotanalytics:UpdateDatastore",
                 "iotanalytics:TagResource",
-                "iotanalytics:UntagResource"
+                "iotanalytics:UntagResource",
+                "iam:Passrole"
             ]
         },
         "delete": {

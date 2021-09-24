@@ -495,7 +495,8 @@
     "handlers": {
         "create": {
             "permissions": [
-                "iotanalytics:CreateDataset"
+                "iotanalytics:CreateDataset",
+                "iam:Passrole"
             ]
         },
         "read": {
@@ -508,7 +509,8 @@
             "permissions": [
                 "iotanalytics:UpdateDataset",
                 "iotanalytics:TagResource",
-                "iotanalytics:UntagResource"
+                "iotanalytics:UntagResource",
+                "iam:Passrole"
             ]
         },
         "delete": {

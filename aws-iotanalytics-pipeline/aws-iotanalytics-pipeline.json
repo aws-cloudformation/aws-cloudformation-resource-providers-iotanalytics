@@ -385,7 +385,8 @@
     "handlers": {
         "create": {
             "permissions": [
-                "iotanalytics:CreatePipeline"
+                "iotanalytics:CreatePipeline",
+                "iam:Passrole"
             ]
         },
         "read": {
@@ -398,7 +399,8 @@
             "permissions": [
                 "iotanalytics:UpdatePipeline",
                 "iotanalytics:TagResource",
-                "iotanalytics:UntagResource"
+                "iotanalytics:UntagResource",
+                "iam:Passrole"
             ]
         },
         "delete": {

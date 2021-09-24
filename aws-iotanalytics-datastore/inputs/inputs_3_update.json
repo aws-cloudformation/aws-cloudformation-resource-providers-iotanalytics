@@ -1,0 +1,26 @@
+{
+  "DatastoreName": "mydatastore3",
+  "Tags": [
+    {
+      "Key": "key2",
+      "Value": "value22"
+    },
+    {
+      "Key": "key3",
+      "Value": "value3"
+    },
+    {
+      "Key": "key4",
+      "Value": "value4"
+    }
+  ],
+  "DatastoreStorage": {
+    "IotSiteWiseMultiLayerStorage": {
+      "CustomerManagedS3Storage": {
+        "Bucket": "cfn-testing-bucket-820552022303",
+        "KeyPrefix": "iota-prefix/"
+      }
+    }
+  }
+}
+

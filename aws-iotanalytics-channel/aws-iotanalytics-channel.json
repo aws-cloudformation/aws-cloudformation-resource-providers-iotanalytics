@@ -121,7 +121,8 @@
     "handlers": {
         "create": {
             "permissions": [
-                "iotanalytics:CreateChannel"
+                "iotanalytics:CreateChannel",
+                "iam:Passrole"
             ]
         },
         "read": {
@@ -134,7 +135,8 @@
             "permissions": [
                 "iotanalytics:UpdateChannel",
                 "iotanalytics:TagResource",
-                "iotanalytics:UntagResource"
+                "iotanalytics:UntagResource",
+                "iam:Passrole"
             ]
         },
         "delete": {

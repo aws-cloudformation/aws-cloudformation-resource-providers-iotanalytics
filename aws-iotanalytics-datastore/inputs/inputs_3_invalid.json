@@ -1,0 +1,9 @@
+{
+  "DatastoreName": "mydatastore4",
+  "Tags": [
+  ],
+  "DatastoreStorage": {
+    "ServiceManagedS3": {
+    }
+  }
+}
