@@ -233,6 +233,9 @@
     "primaryIdentifier": [
         "/properties/DatastoreName"
     ],
+    "createOnlyProperties": [
+        "/properties/DatastoreName"
+    ],
     "readOnlyProperties": [
         "/properties/Id"
     ],

@@ -489,6 +489,9 @@
     "primaryIdentifier": [
         "/properties/DatasetName"
     ],
+    "createOnlyProperties": [
+        "/properties/DatasetName"
+    ],
     "readOnlyProperties": [
         "/properties/Id"
     ],
