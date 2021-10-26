@@ -115,6 +115,9 @@
     "primaryIdentifier": [
         "/properties/ChannelName"
     ],
+    "createOnlyProperties": [
+        "/properties/ChannelName"
+    ],
     "readOnlyProperties": [
         "/properties/Id"
     ],
