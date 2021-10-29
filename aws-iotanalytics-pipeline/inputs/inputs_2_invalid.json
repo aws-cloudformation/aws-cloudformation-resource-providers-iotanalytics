@@ -52,7 +52,7 @@
         "Name": "device_registry_enrich_activity",
         "ThingName": "a_thing_name",
         "Attribute": "device_registry",
-        "RoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
+        "RoleArn": "{{CFNTestingRole}}",
         "Next": "device_shadow_enrich_activity"
       }
     },
@@ -61,7 +61,7 @@
         "Name": "device_shadow_enrich_activity",
         "ThingName": "b_thing_name",
         "Attribute": "device_shadow",
-        "RoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
+        "RoleArn": "{{CFNTestingRole}}",
         "Next": "filter_activity"
       }
     },

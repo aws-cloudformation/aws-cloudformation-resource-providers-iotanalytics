@@ -26,7 +26,7 @@
       "Destination": {
         "S3DestinationConfiguration": {
           "Bucket": "my-iot-analytics-bucket",
-          "RoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
+          "RoleArn": "{{CFNTestingRole}}",
           "Key": "iota-dataset"
         }
       }
@@ -72,8 +72,8 @@
     {
       "ActionName": "container_action",
       "ContainerAction": {
-        "Image": "<account_id>.dkr.ecr.us-east-1.amazonaws.com/cfn-testing-container",
-        "ExecutionRoleArn": "arn:aws:iam::<account_id>:role/cfn-testing-role",
+        "Image": "{{CFNTestingECRRepo}}",
+        "ExecutionRoleArn": "{{CFNTestingRole}}",
         "ResourceConfiguration": {
           "VolumeSizeInGB": 0,
           "ComputeType": "TEST"
