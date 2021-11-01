@@ -7,8 +7,10 @@ import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreRequest
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CustomerManagedDatastoreS3Storage;
 import software.amazon.awssdk.services.iotanalytics.model.Datastore;
+import software.amazon.awssdk.services.iotanalytics.model.DatastoreIotSiteWiseMultiLayerStorage;
 import software.amazon.awssdk.services.iotanalytics.model.DescribeDatastoreRequest;
 import software.amazon.awssdk.services.iotanalytics.model.DescribeDatastoreResponse;
+import software.amazon.awssdk.services.iotanalytics.model.IotSiteWiseCustomerManagedDatastoreS3Storage;
 import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.iotanalytics.model.ResourceAlreadyExistsException;
@@ -245,6 +247,105 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getId()).isEqualTo(TEST_DATASTORE_ID);
     }
 
+    @Test
+    public void GIVEN_request_with_sitewise_multilayer_datastore_WHEN_call_handleRequest_THEN_return_success() {
+        // GIVEN
+        final ResourceModel model = ResourceModel.builder()
+                .datastoreName(TEST_DATASTORE_NAME)
+                .datastoreStorage(DatastoreStorage
+                        .builder()
+                        .iotSiteWiseMultiLayerStorage(IotSiteWiseMultiLayerStorage
+                                .builder()
+                                .customerManagedS3Storage(CustomerManagedS3Storage
+                                        .builder()
+                                        .bucket(TEST_S3_BUCKET)
+                                        .keyPrefix(TEST_PREFIX)
+                                        .build())
+                                .build())
+                        .build())
+                .retentionPeriod(RetentionPeriod.builder().numberOfDays(TEST_DAYS).build())
+                .tags(Arrays.asList(Tag.builder().key(TEST_KEY1).value(TEST_VALUE1).build(),
+                        Tag.builder().key(TEST_KEY2).value(TEST_VALUE2).build()))
+                .build();
+
+        final CreateDatastoreResponse createDatastoreResponse = CreateDatastoreResponse.builder().build();
+
+        final DescribeDatastoreResponse describeDatastoreResponse = DescribeDatastoreResponse.builder()
+                .datastore(Datastore
+                        .builder()
+                        .arn(TEST_DATASTORE_ARN)
+                        .name(TEST_DATASTORE_NAME)
+                        .retentionPeriod(software.amazon.awssdk.services.iotanalytics.model.RetentionPeriod
+                                .builder()
+                                .numberOfDays(TEST_DAYS)
+                                .build())
+                        .storage(software.amazon.awssdk.services.iotanalytics.model.DatastoreStorage
+                                .builder()
+                                .iotSiteWiseMultiLayerStorage(DatastoreIotSiteWiseMultiLayerStorage
+                                        .builder()
+                                        .customerManagedS3Storage(IotSiteWiseCustomerManagedDatastoreS3Storage
+                                                .builder()
+                                                .bucket(TEST_S3_BUCKET)
+                                                .keyPrefix(TEST_PREFIX)
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        final ListTagsForResourceResponse listTagsForResourceResponse = ListTagsForResourceResponse.builder()
+                .tags(software.amazon.awssdk.services.iotanalytics.model.Tag.builder().key(TEST_KEY1).value(TEST_VALUE1).build(),
+                        software.amazon.awssdk.services.iotanalytics.model.Tag.builder().key(TEST_KEY2).value(TEST_VALUE2).build())
+                .build();
+
+        when(proxyClient.client().createDatastore(createDatastoreRequestArgumentCaptor.capture()))
+                .thenReturn(createDatastoreResponse);
+        when(proxyClient.client().describeDatastore(any(DescribeDatastoreRequest.class)))
+                .thenReturn(describeDatastoreResponse);
+        when(proxyClient.client().listTagsForResource(any(ListTagsForResourceRequest.class)))
+                .thenReturn(listTagsForResourceResponse);
+
+        // WHEN
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        verify(proxyClient.client(), times(1)).createDatastore(any(CreateDatastoreRequest.class));
+
+        final CreateDatastoreRequest createDatastoreRequest = createDatastoreRequestArgumentCaptor.getValue();
+        assertThat(createDatastoreRequest.datastoreName()).isEqualTo(TEST_DATASTORE_NAME);
+        assertThat(createDatastoreRequest.retentionPeriod().numberOfDays()).isEqualTo(TEST_DAYS);
+        assertThat(createDatastoreRequest.datastoreStorage().iotSiteWiseMultiLayerStorage().customerManagedS3Storage().bucket()).isEqualTo(TEST_S3_BUCKET);
+        assertThat(createDatastoreRequest.datastoreStorage().iotSiteWiseMultiLayerStorage().customerManagedS3Storage().keyPrefix()).isEqualTo(TEST_PREFIX);
+
+        assertThat(createDatastoreRequest.datastoreStorage().customerManagedS3()).isNull();
+        assertThat(createDatastoreRequest.datastoreStorage().serviceManagedS3()).isNull();
+        assertThat(createDatastoreRequest.fileFormatConfiguration()).isNull();
+
+        assertThat(createDatastoreRequest.tags().size()).isEqualTo(2);
+        assertThat(createDatastoreRequest.tags().get(0).key()).isEqualTo(TEST_KEY1);
+        assertThat(createDatastoreRequest.tags().get(0).value()).isEqualTo(TEST_VALUE1);
+        assertThat(createDatastoreRequest.tags().get(1).key()).isEqualTo(TEST_KEY2);
+        assertThat(createDatastoreRequest.tags().get(1).value()).isEqualTo(TEST_VALUE2);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+
+        assertThat(response.getResourceModel().getDatastoreName()).isEqualTo(request.getDesiredResourceState().getDatastoreName());
+        assertThat(response.getResourceModel().getDatastoreStorage()).isEqualTo(request.getDesiredResourceState().getDatastoreStorage());
+        assertThat(response.getResourceModel().getRetentionPeriod()).isEqualTo(request.getDesiredResourceState().getRetentionPeriod());
+        assertThat(response.getResourceModel().getTags()).isEqualTo(request.getDesiredResourceState().getTags());
+        assertThat(response.getResourceModel().getId()).isEqualTo(TEST_DATASTORE_ID);
+    }
 
     @Test
     public void GIVEN_request_with_id_WHEN_call_handleRequest_THEN_return_InvalidRequest() {

@@ -1,0 +1,10 @@
+{
+    "DatastoreName": "mydatastore3",
+    "DatastoreStorage": {
+        "CustomerManagedS3": {
+            "Bucket": "cfn-testing-bucket-{{TestRegion}}-{{TestAccountId}}",
+            "RoleArn": "{{CFNTestingRole}}",
+            "KeyPrefix": "iota-prefix/"
+        }
+    }
+}

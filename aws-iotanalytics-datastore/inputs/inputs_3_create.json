@@ -1,0 +1,11 @@
+{
+    "DatastoreName": "mydatastore3",
+    "DatastoreStorage": {
+        "IotSiteWiseMultiLayerStorage": {
+            "CustomerManagedS3Storage": {
+                "Bucket": "cfn-testing-bucket-{{TestRegion}}-{{TestAccountId}}",
+                "KeyPrefix": "iota-prefix/"
+            }
+        }
+    }
+}

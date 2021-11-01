@@ -4,6 +4,7 @@ import com.amazonaws.util.StringUtils;
 import com.google.common.annotations.VisibleForTesting;
 import software.amazon.awssdk.services.iotanalytics.model.Column;
 import software.amazon.awssdk.services.iotanalytics.model.Datastore;
+import software.amazon.awssdk.services.iotanalytics.model.DatastoreIotSiteWiseMultiLayerStorage;
 import software.amazon.awssdk.services.iotanalytics.model.DatastorePartition;
 import software.amazon.awssdk.services.iotanalytics.model.DatastorePartitions;
 import software.amazon.awssdk.services.iotanalytics.model.DatastoreStorage;
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.iotanalytics.model.DescribeDatastoreRespo
 import software.amazon.awssdk.services.iotanalytics.model.FileFormatConfiguration;
 import software.amazon.awssdk.services.iotanalytics.model.InvalidRequestException;
 import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
+import software.amazon.awssdk.services.iotanalytics.model.IotSiteWiseCustomerManagedDatastoreS3Storage;
 import software.amazon.awssdk.services.iotanalytics.model.JsonConfiguration;
 import software.amazon.awssdk.services.iotanalytics.model.LimitExceededException;
 import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceResponse;
@@ -121,13 +123,28 @@ class Translator {
             @Nullable final DatastoreStorage datastoreStorage
     ) {
         if (datastoreStorage != null && datastoreStorage.customerManagedS3() != null) {
-            return com.amazonaws.iotanalytics.datastore.DatastoreStorage.builder().customerManagedS3(
-                    com.amazonaws.iotanalytics.datastore.CustomerManagedS3.builder()
-                            .bucket(datastoreStorage.customerManagedS3().bucket())
-                            .keyPrefix(datastoreStorage.customerManagedS3().keyPrefix())
-                            .roleArn(datastoreStorage.customerManagedS3().roleArn())
-                            .build())
-                    .build();
+            if (datastoreStorage.customerManagedS3() != null) {
+                return com.amazonaws.iotanalytics.datastore.DatastoreStorage.builder().customerManagedS3(
+                        com.amazonaws.iotanalytics.datastore.CustomerManagedS3.builder()
+                                .bucket(datastoreStorage.customerManagedS3().bucket())
+                                .keyPrefix(datastoreStorage.customerManagedS3().keyPrefix())
+                                .roleArn(datastoreStorage.customerManagedS3().roleArn())
+                                .build())
+                        .build();
+            }
+
+            if (datastoreStorage.iotSiteWiseMultiLayerStorage() != null) {
+                return com.amazonaws.iotanalytics.datastore.DatastoreStorage.builder().iotSiteWiseMultiLayerStorage(
+                        com.amazonaws.iotanalytics.datastore.IotSiteWiseMultiLayerStorage.builder()
+                                .customerManagedS3Storage(
+                                        com.amazonaws.iotanalytics.datastore.CustomerManagedS3Storage.builder()
+                                                .bucket(datastoreStorage.iotSiteWiseMultiLayerStorage().customerManagedS3Storage().bucket())
+                                                .keyPrefix(datastoreStorage.iotSiteWiseMultiLayerStorage().customerManagedS3Storage().keyPrefix())
+                                                .build()
+                                )
+                                .build())
+                        .build();
+            }
         }
         return com.amazonaws.iotanalytics.datastore.DatastoreStorage
                 .builder()
@@ -142,6 +159,16 @@ class Translator {
             return null;
         }
         final DatastoreStorage.Builder builder = DatastoreStorage.builder();
+        if (cfnDatastoreStorage.getIotSiteWiseMultiLayerStorage() != null) {
+            builder.iotSiteWiseMultiLayerStorage(DatastoreIotSiteWiseMultiLayerStorage.builder()
+                    .customerManagedS3Storage(IotSiteWiseCustomerManagedDatastoreS3Storage.builder()
+                            .bucket(cfnDatastoreStorage.getIotSiteWiseMultiLayerStorage().getCustomerManagedS3Storage().getBucket())
+                            .keyPrefix(cfnDatastoreStorage.getIotSiteWiseMultiLayerStorage().getCustomerManagedS3Storage().getKeyPrefix())
+                            .build()
+                    )
+                    .build()
+            );
+        }
         if (cfnDatastoreStorage.getCustomerManagedS3() != null) {
             builder.customerManagedS3(CustomerManagedDatastoreS3Storage
                     .builder()
