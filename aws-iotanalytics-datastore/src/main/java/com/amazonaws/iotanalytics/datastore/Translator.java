@@ -122,7 +122,7 @@ class Translator {
     private static com.amazonaws.iotanalytics.datastore.DatastoreStorage translateDatastoreStorageToCfn(
             @Nullable final DatastoreStorage datastoreStorage
     ) {
-        if (datastoreStorage != null && datastoreStorage.customerManagedS3() != null) {
+        if (datastoreStorage != null) {
             if (datastoreStorage.customerManagedS3() != null) {
                 return com.amazonaws.iotanalytics.datastore.DatastoreStorage.builder().customerManagedS3(
                         com.amazonaws.iotanalytics.datastore.CustomerManagedS3.builder()
