@@ -6,6 +6,8 @@ import software.amazon.awssdk.services.iotanalytics.model.ChannelActivity;
 import software.amazon.awssdk.services.iotanalytics.model.CreatePipelineRequest;
 import software.amazon.awssdk.services.iotanalytics.model.DatastoreActivity;
 import software.amazon.awssdk.services.iotanalytics.model.DeletePipelineRequest;
+import software.amazon.awssdk.services.iotanalytics.model.DescribePipelineRequest;
+import software.amazon.awssdk.services.iotanalytics.model.DescribePipelineResponse;
 import software.amazon.awssdk.services.iotanalytics.model.DeviceRegistryEnrichActivity;
 import software.amazon.awssdk.services.iotanalytics.model.DeviceShadowEnrichActivity;
 import software.amazon.awssdk.services.iotanalytics.model.FilterActivity;
@@ -13,11 +15,9 @@ import software.amazon.awssdk.services.iotanalytics.model.InvalidRequestExceptio
 import software.amazon.awssdk.services.iotanalytics.model.IoTAnalyticsException;
 import software.amazon.awssdk.services.iotanalytics.model.LambdaActivity;
 import software.amazon.awssdk.services.iotanalytics.model.LimitExceededException;
+import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.iotanalytics.model.MathActivity;
 import software.amazon.awssdk.services.iotanalytics.model.Pipeline;
-import software.amazon.awssdk.services.iotanalytics.model.DescribePipelineResponse;
-import software.amazon.awssdk.services.iotanalytics.model.DescribePipelineRequest;
-import software.amazon.awssdk.services.iotanalytics.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.iotanalytics.model.PipelineActivity;
 import software.amazon.awssdk.services.iotanalytics.model.RemoveAttributesActivity;
 import software.amazon.awssdk.services.iotanalytics.model.ResourceAlreadyExistsException;
@@ -39,6 +39,7 @@ import software.amazon.cloudformation.exceptions.CfnThrottlingException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -90,7 +91,7 @@ class Translator {
         if (e instanceof ResourceAlreadyExistsException) {
             return new CfnAlreadyExistsException(e);
         } else if (e instanceof ResourceNotFoundException) {
-            if(StringUtils.isNullOrEmpty(name)) return new CfnNotFoundException(e);
+            if (StringUtils.isNullOrEmpty(name)) return new CfnNotFoundException(e);
             return new CfnNotFoundException(ResourceModel.TYPE_NAME, name);
         } else if (e instanceof InvalidRequestException) {
             return new CfnInvalidRequestException(e.getMessage(), e);
@@ -138,33 +139,49 @@ class Translator {
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private static List<PipelineActivity> translatePipelineActivitiesFromCfn(
-            @Nonnull List<Activity> cfnActivityList) {
-        return cfnActivityList.stream().map(cfnActivity -> {
-            if (cfnActivity.getChannel() != null) {
-                return translateChannelActivityFromCfn(cfnActivity.getChannel());
-            } else if (cfnActivity.getAddAttributes() != null) {
-                return translateAddAttributesActivityFromCfn(cfnActivity.getAddAttributes());
-            } else if (cfnActivity.getRemoveAttributes() != null) {
-                return translateRemoveAttributesActivityFromCfn(cfnActivity.getRemoveAttributes());
-            } else if (cfnActivity.getSelectAttributes() != null) {
-                return translateSelectAttributesActivityFromCfn(cfnActivity.getSelectAttributes());
-            } else if (cfnActivity.getDeviceRegistryEnrich() != null) {
-                return translateDeviceRegistryEnrichActivityFromCfn(cfnActivity.getDeviceRegistryEnrich());
-            } else if (cfnActivity.getDeviceShadowEnrich() != null) {
-                return translateDeviceShadowEnrichActivityFromCfn(cfnActivity.getDeviceShadowEnrich());
-            } else if (cfnActivity.getFilter() != null) {
-                return translateFilterActivityFromCfn(cfnActivity.getFilter());
-            } else if (cfnActivity.getMath() != null) {
-                return translateMathActivityFromCfn(cfnActivity.getMath());
-            } else if (cfnActivity.getLambda() != null) {
-                return translateLambdaActivityFromCfn(cfnActivity.getLambda());
-            } else if (cfnActivity.getDatastore() != null) {
-                return translateDatastoreActivityFromCfn(cfnActivity.getDatastore());
-            } else {
-                return null;
-            }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+    private static List<PipelineActivity> translatePipelineActivitiesFromCfn(final List<Activity> cfnActivityList) {
+        // To maintain backwards compatibility, we need to accept null lists and return an empty one,
+        //   even if it will eventually fail on API call.
+        final List<PipelineActivity> pipelineActivities = new ArrayList<>();
+
+        if (cfnActivityList != null) {
+            // To maintain backwards compatibility, we need to add all pipeline activities within the same
+            //   PipelineActivity as it's own element in a list
+            cfnActivityList.forEach(cfnActivity -> {
+                if (cfnActivity.getChannel() != null) {
+                    pipelineActivities.add(translateChannelActivityFromCfn(cfnActivity.getChannel()));
+                }
+                if (cfnActivity.getAddAttributes() != null) {
+                    pipelineActivities.add(translateAddAttributesActivityFromCfn(cfnActivity.getAddAttributes()));
+                }
+                if (cfnActivity.getRemoveAttributes() != null) {
+                    pipelineActivities.add(translateRemoveAttributesActivityFromCfn(cfnActivity.getRemoveAttributes()));
+                }
+                if (cfnActivity.getSelectAttributes() != null) {
+                    pipelineActivities.add(translateSelectAttributesActivityFromCfn(cfnActivity.getSelectAttributes()));
+                }
+                if (cfnActivity.getDeviceRegistryEnrich() != null) {
+                    pipelineActivities.add(translateDeviceRegistryEnrichActivityFromCfn(cfnActivity.getDeviceRegistryEnrich()));
+                }
+                if (cfnActivity.getDeviceShadowEnrich() != null) {
+                    pipelineActivities.add(translateDeviceShadowEnrichActivityFromCfn(cfnActivity.getDeviceShadowEnrich()));
+                }
+                if (cfnActivity.getFilter() != null) {
+                    pipelineActivities.add(translateFilterActivityFromCfn(cfnActivity.getFilter()));
+                }
+                if (cfnActivity.getMath() != null) {
+                    pipelineActivities.add(translateMathActivityFromCfn(cfnActivity.getMath()));
+                }
+                if (cfnActivity.getLambda() != null) {
+                    pipelineActivities.add(translateLambdaActivityFromCfn(cfnActivity.getLambda()));
+                }
+                if (cfnActivity.getDatastore() != null) {
+                    pipelineActivities.add(translateDatastoreActivityFromCfn(cfnActivity.getDatastore()));
+                }
+            });
+        }
+
+        return pipelineActivities;
     }
 
     private static Activity translateChannelActivityToCfn(

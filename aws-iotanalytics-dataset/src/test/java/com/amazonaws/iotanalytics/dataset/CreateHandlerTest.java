@@ -2,6 +2,8 @@ package com.amazonaws.iotanalytics.dataset;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import software.amazon.awssdk.services.iotanalytics.model.CreateChannelRequest;
+import software.amazon.awssdk.services.iotanalytics.model.CreateChannelResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatasetRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatasetResponse;
 import software.amazon.awssdk.services.iotanalytics.model.Dataset;
@@ -54,6 +56,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
+    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test_logical_resource_identifier";
+    private static final String TEST_CLIENT_REQUEST_TOKEN = "test_client_request_token";
 
 
     private CreateHandler handler;
@@ -207,5 +211,32 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThrows(CfnAlreadyExistsException.class,
                 () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
         assertThat(createDatasetRequestArgumentCaptor.getValue().datasetName()).isEqualTo(TEST_DATASET_NAME);
+    }
+
+    @Test
+    public void GIVEN_missing_datasetName_WHEN_call_handleRequest_THEN_return_success_with_generated_datasetName() {
+        // GIVEN
+        final ResourceModel model = ResourceModel.builder()
+                .actions(Collections.singletonList(CFN_SQL_ACTION))
+                .build();
+
+        final CreateDatasetResponse createDatasetResponse = CreateDatasetResponse.builder()
+                .build();
+        when(proxyClient.client().createDataset(createDatasetRequestArgumentCaptor.capture())).thenReturn(createDatasetResponse);
+
+        // WHEN
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .logicalResourceIdentifier(TEST_LOGICAL_RESOURCE_IDENTIFIER)
+                .clientRequestToken(TEST_CLIENT_REQUEST_TOKEN)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        verify(proxyClient.client(), times(1)).createDataset(any(CreateDatasetRequest.class));
+        final CreateDatasetRequest createDatasetRequest = createDatasetRequestArgumentCaptor.getValue();
+        assertThat(createDatasetRequest.datasetName()).isNotBlank();
     }
 }

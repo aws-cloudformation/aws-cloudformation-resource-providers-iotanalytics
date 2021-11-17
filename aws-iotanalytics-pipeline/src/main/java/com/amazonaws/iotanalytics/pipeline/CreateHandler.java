@@ -11,10 +11,12 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+import software.amazon.cloudformation.resource.IdentifierUtils;
 
 public class CreateHandler extends BaseIoTAnalyticsHandler {
     private static final String CALL_GRAPH = "AWS-IoTAnalytics-Pipeline::Create";
     private static final String OPERATION = "CreatePipeline";
+    private static final int MAX_NAME_LENGTH = 128;
 
     private Logger logger;
 
@@ -34,6 +36,16 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
             logger.log(String.format("%s [%s] id is read-only", ResourceModel.TYPE_NAME, model.getId()));
             return ProgressEvent.failed(model, null, HandlerErrorCode.InvalidRequest,
                     "Id is a read-only property and cannot be set.");
+        }
+
+        if (StringUtils.isBlank(model.getPipelineName())) {
+            final String pipelineName = IdentifierUtils.generateResourceIdentifier(
+                    request.getLogicalResourceIdentifier(),
+                    request.getClientRequestToken(),
+                    MAX_NAME_LENGTH
+            );
+            logger.log(String.format("Missing channelName. Generated pipelineName for %s: %s", ResourceModel.TYPE_NAME, pipelineName));
+            model.setPipelineName(pipelineName);
         }
 
         return ProgressEvent.progress(model, callbackContext)

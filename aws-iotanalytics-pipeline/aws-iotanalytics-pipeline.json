@@ -379,7 +379,7 @@
             ]
         }
     },
-    "required" : [ "PipelineName", "PipelineActivities" ],
+    "required" : [ "PipelineActivities" ],
     "primaryIdentifier" : [
         "/properties/PipelineName"
     ],

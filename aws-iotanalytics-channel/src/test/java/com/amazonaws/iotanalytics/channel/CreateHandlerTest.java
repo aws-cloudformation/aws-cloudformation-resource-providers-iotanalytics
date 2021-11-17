@@ -46,6 +46,8 @@ public class CreateHandlerTest extends AbstractTestBase {
     private static final String TEST_VALUE1 = "value1";
     private static final String TEST_KEY2 = "key2";
     private static final String TEST_VALUE2 = "value2";
+    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test_logical_resource_identifier";
+    private static final String TEST_CLIENT_REQUEST_TOKEN = "test_client_request_token";
 
     private CreateHandler handler;
 
@@ -189,5 +191,29 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThrows(CfnAlreadyExistsException.class,
                 () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
         assertThat(createChannelRequestCaptor.getValue().channelName()).isEqualTo(TEST_CHANNEL_NAME);
+    }
+
+    @Test
+    public void GIVEN_missing_channelName_WHEN_call_handleRequest_THEN_return_success_with_generated_channelName() {
+        // GIVEN
+        final ResourceModel model = ResourceModel.builder().build();
+
+        final CreateChannelResponse createChannelResponse = CreateChannelResponse.builder().build();
+        when(proxyClient.client().createChannel(createChannelRequestCaptor.capture())).thenReturn(createChannelResponse);
+
+        // WHEN
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .logicalResourceIdentifier(TEST_LOGICAL_RESOURCE_IDENTIFIER)
+                .clientRequestToken(TEST_CLIENT_REQUEST_TOKEN)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        verify(proxyClient.client(), times(1)).createChannel(any(CreateChannelRequest.class));
+        final CreateChannelRequest createChannelRequest = createChannelRequestCaptor.getValue();
+        assertThat(createChannelRequest.channelName()).isNotBlank();
     }
 }

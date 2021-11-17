@@ -3,6 +3,8 @@ package com.amazonaws.iotanalytics.pipeline;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 
+import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreRequest;
+import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CreatePipelineRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CreatePipelineResponse;
 
@@ -34,7 +36,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
-
+    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test_logical_resource_identifier";
+    private static final String TEST_CLIENT_REQUEST_TOKEN = "test_client_request_token";
 
     private CreateHandler handler;
 
@@ -191,5 +194,43 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThrows(CfnAlreadyExistsException.class,
                 () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
         assertThat(createPipelineRequestArgumentCaptor.getValue().pipelineName()).isEqualTo(TEST_PIPELINE_NAME);
+    }
+
+    @Test
+    public void GIVEN_missing_pipelineName_WHEN_call_handleRequest_THEN_return_success_with_generated_pipelineName() {
+        // GIVEN
+        final ResourceModel model = ResourceModel.builder()
+                .pipelineActivities(Arrays.asList(
+                        CFN_CHANNEL_ACTIVITY,
+                        CFN_ADD_ATTR_ACTIVITY,
+                        CFN_RM_ATTR_ACTIVITY,
+                        CFN_SELECT_ATTR_ACTIVITY,
+                        CFN_DEVICE_REGISTRY_ENRICH_ACTIVITY,
+                        CFN_DEVICE_SHADOW_ACTIVITY,
+                        CFN_FILTER_ACTIVITY,
+                        CFN_MATH_ACTIVITY,
+                        CFN_LAMBDA_ACTIVITY,
+                        CFN_DATASTORE_ACTIVITY
+                ))
+                .build();
+
+        final CreatePipelineResponse createPipelineResponse = CreatePipelineResponse.builder()
+                .build();
+        when(proxyClient.client().createPipeline(createPipelineRequestArgumentCaptor.capture())).thenReturn(createPipelineResponse);
+
+        // WHEN
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .logicalResourceIdentifier(TEST_LOGICAL_RESOURCE_IDENTIFIER)
+                .clientRequestToken(TEST_CLIENT_REQUEST_TOKEN)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        verify(proxyClient.client(), times(1)).createPipeline(any(CreatePipelineRequest.class));
+        final CreatePipelineRequest createDatastoreRequest = createPipelineRequestArgumentCaptor.getValue();
+        assertThat(createDatastoreRequest.pipelineName()).isNotBlank();
     }
 }
