@@ -3,6 +3,8 @@ package com.amazonaws.iotanalytics.datastore;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 
+import software.amazon.awssdk.services.iotanalytics.model.CreateDatasetRequest;
+import software.amazon.awssdk.services.iotanalytics.model.CreateDatasetResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CustomerManagedDatastoreS3Storage;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -54,6 +57,8 @@ public class CreateHandlerTest extends AbstractTestBase {
     private static final String TEST_ATTRIBUTE_PARTITION = "attribute";
     private static final String TEST_TIMESTAMP_PARTITION_NAME = "timestampAttribute";
     private static final String TEST_TIMESTAMP_PARTITION_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test_logical_resource_identifier";
+    private static final String TEST_CLIENT_REQUEST_TOKEN = "test_client_request_token";
 
     private CreateHandler handler;
 
@@ -387,5 +392,30 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThrows(CfnAlreadyExistsException.class,
                 () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
         assertThat(createDatastoreRequestArgumentCaptor.getValue().datastoreName()).isEqualTo(TEST_DATASTORE_NAME);
+    }
+
+    @Test
+    public void GIVEN_missing_datastoreName_WHEN_call_handleRequest_THEN_return_success_with_generated_datastoreName() {
+        // GIVEN
+        final ResourceModel model = ResourceModel.builder().build();
+
+        final CreateDatastoreResponse createDatastoreResponse = CreateDatastoreResponse.builder()
+                .build();
+        when(proxyClient.client().createDatastore(createDatastoreRequestArgumentCaptor.capture())).thenReturn(createDatastoreResponse);
+
+        // WHEN
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .logicalResourceIdentifier(TEST_LOGICAL_RESOURCE_IDENTIFIER)
+                .clientRequestToken(TEST_CLIENT_REQUEST_TOKEN)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        // THEN
+        verify(proxyClient.client(), times(1)).createDatastore(any(CreateDatastoreRequest.class));
+        final CreateDatastoreRequest createDatastoreRequest = createDatastoreRequestArgumentCaptor.getValue();
+        assertThat(createDatastoreRequest.datastoreName()).isNotBlank();
     }
 }

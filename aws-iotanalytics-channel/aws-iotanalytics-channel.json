@@ -9,7 +9,7 @@
         },
         "ChannelName": {
             "type": "string",
-            "pattern": "[a-zA-Z0-9_]+",
+            "pattern": "(^(?!_{2}))(^[a-zA-Z0-9_]+$)",
             "minLength": 1,
             "maxLength": 128
         },
@@ -30,9 +30,6 @@
             }
         }
     },
-    "required": [
-        "ChannelName"
-    ],
     "definitions": {
         "CustomerManagedS3": {
             "type": "object",
@@ -40,7 +37,7 @@
             "properties": {
                 "Bucket": {
                     "type": "string",
-                    "pattern": "[a-zA-Z0-9.\\-_]*",
+                    "pattern": "^[a-zA-Z0-9.\\-_]*$",
                     "minLength": 3,
                     "maxLength": 255
                 },
@@ -51,7 +48,7 @@
                 },
                 "KeyPrefix": {
                     "type": "string",
-                    "pattern": "[a-zA-Z0-9!_.*'()/{}:-]*/",
+                    "pattern": "^[a-zA-Z0-9!_.*'()/{}:-]*/$",
                     "minLength": 1,
                     "maxLength": 255
                 }

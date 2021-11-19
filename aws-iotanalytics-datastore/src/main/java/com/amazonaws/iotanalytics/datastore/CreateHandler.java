@@ -11,10 +11,12 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+import software.amazon.cloudformation.resource.IdentifierUtils;
 
 public class CreateHandler extends BaseIoTAnalyticsHandler {
     private static final String CALL_GRAPH = "AWS-IoTAnalytics-Datastore::Create";
     private static final String OPERATION = "CreateDatastore";
+    private static final int MAX_NAME_LENGTH = 128;
 
     private Logger logger;
 
@@ -34,6 +36,17 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
             return ProgressEvent.failed(model, null, HandlerErrorCode.InvalidRequest,
                     "Id is a read-only property and cannot be set.");
         }
+
+        if (StringUtils.isBlank(model.getDatastoreName())) {
+            final String datastoreName = IdentifierUtils.generateResourceIdentifier(
+                    request.getLogicalResourceIdentifier(),
+                    request.getClientRequestToken(),
+                    MAX_NAME_LENGTH
+            );
+            logger.log(String.format("Missing channelName. Generated datastoreName for %s: %s", ResourceModel.TYPE_NAME, datastoreName));
+            model.setDatastoreName(datastoreName);
+        }
+
         return ProgressEvent.progress(model, callbackContext)
                 .then(progress ->
                         proxy.initiate(CALL_GRAPH, proxyClient, model, callbackContext)

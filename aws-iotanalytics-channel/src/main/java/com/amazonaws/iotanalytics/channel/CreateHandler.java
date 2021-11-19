@@ -11,10 +11,12 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.cloudformation.resource.IdentifierUtils;
 
 public class CreateHandler extends BaseIoTAnalyticsHandler {
     private static final String CALL_GRAPH = "AWS-IoTAnalytics-Channel::Create";
     private static final String OPERATION = "CreateChannel";
+    private static final int MAX_NAME_LENGTH = 128;
 
     private Logger logger;
 
@@ -34,6 +36,16 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
             logger.log(String.format("%s [%s] id is read-only", ResourceModel.TYPE_NAME, model.getId()));
             return ProgressEvent.failed(model, null, HandlerErrorCode.InvalidRequest,
                     "Id is a read-only property and cannot be set.");
+        }
+
+        if (StringUtils.isBlank(model.getChannelName())) {
+            final String channelName = IdentifierUtils.generateResourceIdentifier(
+                    request.getLogicalResourceIdentifier(),
+                    request.getClientRequestToken(),
+                    MAX_NAME_LENGTH
+            );
+            logger.log(String.format("Missing channelName. Generated channelName for %s: %s", ResourceModel.TYPE_NAME, channelName));
+            model.setChannelName(channelName);
         }
 
         return ProgressEvent.progress(model, callbackContext)
