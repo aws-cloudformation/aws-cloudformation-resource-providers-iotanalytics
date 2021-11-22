@@ -44,7 +44,7 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
                     request.getClientRequestToken(),
                     MAX_NAME_LENGTH
             );
-            logger.log(String.format("Missing channelName. Generated pipelineName for %s: %s", ResourceModel.TYPE_NAME, pipelineName));
+            logger.log(String.format("Missing pipelineName. Generated pipelineName for %s: %s", ResourceModel.TYPE_NAME, pipelineName));
             model.setPipelineName(pipelineName);
         }
 
