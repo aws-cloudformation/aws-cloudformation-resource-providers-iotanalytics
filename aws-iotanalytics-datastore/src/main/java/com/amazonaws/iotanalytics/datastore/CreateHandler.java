@@ -43,7 +43,7 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
                     request.getClientRequestToken(),
                     MAX_NAME_LENGTH
             );
-            logger.log(String.format("Missing channelName. Generated datastoreName for %s: %s", ResourceModel.TYPE_NAME, datastoreName));
+            logger.log(String.format("Missing datastoreName. Generated datastoreName for %s: %s", ResourceModel.TYPE_NAME, datastoreName));
             model.setDatastoreName(datastoreName);
         }
 
