@@ -43,7 +43,7 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
                     request.getLogicalResourceIdentifier(),
                     request.getClientRequestToken(),
                     MAX_NAME_LENGTH
-            );
+            ).replaceAll("-", "_");
             logger.log(String.format("Missing datasetName. Generated datasetName for %s: %s", ResourceModel.TYPE_NAME, datasetName));
             model.setDatasetName(datasetName);
         }
