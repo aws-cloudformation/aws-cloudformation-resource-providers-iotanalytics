@@ -27,7 +27,7 @@
             "type" : "array",
             "uniqueItems" : false,
             "insertionOrder": false,
-            "minItems": 2,
+            "minItems": 1,
             "maxItems": 25,
             "items" : {
                 "$ref" : "#/definitions/Activity"
