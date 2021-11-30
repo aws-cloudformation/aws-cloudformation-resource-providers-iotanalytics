@@ -43,7 +43,7 @@ public class CreateHandler extends BaseIoTAnalyticsHandler {
                     request.getLogicalResourceIdentifier(),
                     request.getClientRequestToken(),
                     MAX_NAME_LENGTH
-            );
+            ).replaceAll("-", "_");
             logger.log(String.format("Missing channelName. Generated channelName for %s: %s", ResourceModel.TYPE_NAME, channelName));
             model.setChannelName(channelName);
         }
