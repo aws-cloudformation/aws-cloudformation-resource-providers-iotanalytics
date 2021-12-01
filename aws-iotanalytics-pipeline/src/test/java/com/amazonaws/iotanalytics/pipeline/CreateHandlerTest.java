@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
-    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test_logical_resource_identifier";
+    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test-logical-resource-identifier";
     private static final String TEST_CLIENT_REQUEST_TOKEN = "test_client_request_token";
 
     private CreateHandler handler;
