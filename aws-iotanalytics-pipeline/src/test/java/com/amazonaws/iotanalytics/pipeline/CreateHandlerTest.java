@@ -3,8 +3,6 @@ package com.amazonaws.iotanalytics.pipeline;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 
-import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreRequest;
-import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CreatePipelineRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CreatePipelineResponse;
 
@@ -28,6 +26,7 @@ import java.util.Arrays;
 
 import static com.amazonaws.iotanalytics.pipeline.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
-    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test_logical_resource_identifier";
+    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test-logical-resource-identifier";
     private static final String TEST_CLIENT_REQUEST_TOKEN = "test_client_request_token";
 
     private CreateHandler handler;
@@ -230,7 +229,8 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         // THEN
         verify(proxyClient.client(), times(1)).createPipeline(any(CreatePipelineRequest.class));
-        final CreatePipelineRequest createDatastoreRequest = createPipelineRequestArgumentCaptor.getValue();
-        assertThat(createDatastoreRequest.pipelineName()).isNotBlank();
+        final CreatePipelineRequest createPipelineRequest = createPipelineRequestArgumentCaptor.getValue();
+        assertThat(createPipelineRequest.pipelineName()).isNotBlank();
+        assertFalse(createPipelineRequest.pipelineName().contains("-"));
     }
 }

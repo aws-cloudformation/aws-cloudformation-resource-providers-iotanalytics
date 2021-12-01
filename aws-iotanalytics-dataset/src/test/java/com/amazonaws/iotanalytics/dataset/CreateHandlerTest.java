@@ -2,8 +2,6 @@ package com.amazonaws.iotanalytics.dataset;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import software.amazon.awssdk.services.iotanalytics.model.CreateChannelRequest;
-import software.amazon.awssdk.services.iotanalytics.model.CreateChannelResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatasetRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatasetResponse;
 import software.amazon.awssdk.services.iotanalytics.model.Dataset;
@@ -48,6 +46,7 @@ import static com.amazonaws.iotanalytics.dataset.TestConstants.TEST_KEY2;
 import static com.amazonaws.iotanalytics.dataset.TestConstants.TEST_VALUE1;
 import static com.amazonaws.iotanalytics.dataset.TestConstants.TEST_VALUE2;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -56,7 +55,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
-    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test_logical_resource_identifier";
+    private static final String TEST_LOGICAL_RESOURCE_IDENTIFIER = "test-logical-resource-identifier";
     private static final String TEST_CLIENT_REQUEST_TOKEN = "test_client_request_token";
 
 
@@ -238,5 +237,6 @@ public class CreateHandlerTest extends AbstractTestBase {
         verify(proxyClient.client(), times(1)).createDataset(any(CreateDatasetRequest.class));
         final CreateDatasetRequest createDatasetRequest = createDatasetRequestArgumentCaptor.getValue();
         assertThat(createDatasetRequest.datasetName()).isNotBlank();
+        assertFalse(createDatasetRequest.datasetName().contains("-"));
     }
 }
