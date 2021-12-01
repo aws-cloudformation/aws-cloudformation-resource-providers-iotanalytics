@@ -3,8 +3,6 @@ package com.amazonaws.iotanalytics.datastore;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 
-import software.amazon.awssdk.services.iotanalytics.model.CreateDatasetRequest;
-import software.amazon.awssdk.services.iotanalytics.model.CreateDatasetResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreRequest;
 import software.amazon.awssdk.services.iotanalytics.model.CreateDatastoreResponse;
 import software.amazon.awssdk.services.iotanalytics.model.CustomerManagedDatastoreS3Storage;
@@ -27,9 +25,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -417,5 +415,6 @@ public class CreateHandlerTest extends AbstractTestBase {
         verify(proxyClient.client(), times(1)).createDatastore(any(CreateDatastoreRequest.class));
         final CreateDatastoreRequest createDatastoreRequest = createDatastoreRequestArgumentCaptor.getValue();
         assertThat(createDatastoreRequest.datastoreName()).isNotBlank();
+        assertFalse(createDatastoreRequest.datastoreName().contains("-"));
     }
 }

@@ -25,6 +25,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -215,5 +216,6 @@ public class CreateHandlerTest extends AbstractTestBase {
         verify(proxyClient.client(), times(1)).createChannel(any(CreateChannelRequest.class));
         final CreateChannelRequest createChannelRequest = createChannelRequestCaptor.getValue();
         assertThat(createChannelRequest.channelName()).isNotBlank();
+        assertFalse(createChannelRequest.channelName().contains("-"));
     }
 }
